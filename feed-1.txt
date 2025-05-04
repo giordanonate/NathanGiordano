@@ -1,0 +1,140 @@
+import { useEffect, useRef } from 'react';
+import Head from 'next/head';
+import path from 'path';
+import fs from 'fs';
+import styles from '../styles/feed.module.css';
+import Masonry from 'react-masonry-css';
+
+export async function getStaticProps() {
+  const dir = path.join(process.cwd(), 'public/sample-images');
+  const files = fs.readdirSync(dir);
+  const feedItems = files
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .map(file => `/sample-images/${file}`)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 45); // Adjust to fit within 6000px height
+
+  return {
+    props: {
+      feedItems,
+    },
+  };
+}
+
+export default function Feed({ feedItems }) {
+  const itemRefs = useRef([]);
+
+// Scroll to top on page load (Next.js-safe)
+useEffect(() => {
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+}, []);
+
+  // Fade-in effect on grid items
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.visible);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    itemRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      itemRefs.current.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+    };
+  }, []);
+
+  // Scroll-triggered name badge visibility
+  useEffect(() => {
+    const badge = document.getElementById('nameBadge');
+    const trigger = document.getElementById('badgeTrigger');
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (badge) {
+          if (entry.isIntersecting) {
+            badge.classList.add(styles.visible);
+          } else {
+            badge.classList.remove(styles.visible);
+          }
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (trigger) observer.observe(trigger);
+    return () => trigger && observer.unobserve(trigger);
+  }, []);
+
+  const breakpointColumnsObj = {
+    default: 3,
+    768: 2,
+    480: 1,
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Feed – Nathan Giordano</title>
+      </Head>
+
+      <div className={styles.scrollContainer}>
+        <main className={styles.container}>
+          <div className={styles.gridWrapper}>
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className={styles.masonry}
+              columnClassName={styles.column}
+            >
+              {feedItems.map((src, idx) => (
+                <div
+                  key={idx}
+                  ref={(el) => (itemRefs.current[idx] = el)}
+                  className={styles.item}
+                >
+                  {src.endsWith('.mp4') ? (
+                    <video src={src} autoPlay muted loop playsInline />
+                  ) : (
+                    <img src={src} alt={`Feed item ${idx}`} loading="lazy" />
+                  )}
+                </div>
+              ))}
+            </Masonry>
+
+            {/* Name badge just above the gradient */}
+     <div id="nameBadge" className={styles.nameBadge}>
+  <button className={styles.rerollButton} onClick={() => window.location.reload()}>
+    Reroll
+  </button>
+  Nathan Giordano
+</div>
+
+
+            {/* Gradient overlay at bottom */}
+            <img
+              src="/assets/fade-overlay.png"
+              alt="Fade Overlay"
+              id="fadeOverlay"
+              className={styles.fadeOverlay}
+            />
+          </div>
+
+          {/* ✅ Trigger placed AFTER the clipped grid */}
+          <div id="badgeTrigger" className={styles.badgeTrigger} />
+        </main>
+      </div>
+    </>
+  );
+}

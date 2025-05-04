@@ -1,0 +1,138 @@
+import { useEffect, useRef, useState } from 'react';
+import Head from 'next/head';
+import path from 'path';
+import fs from 'fs';
+import Masonry from 'react-masonry-css';
+import styles from '../styles/feed.module.css';
+
+export async function getStaticProps() {
+  const dir = path.join(process.cwd(), 'public/nathan-giordano');
+  const files = fs.readdirSync(dir);
+  const media = files
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .map(file => `/nathan-giordano/${file}`);
+
+  return {
+    props: { media },
+  };
+}
+
+export default function Home({ media }) {
+  const itemRefs = useRef([]);
+  const [shuffled, setShuffled] = useState([]);
+
+  useEffect(() => {
+    const shuffledItems = [...media].sort(() => 0.5 - Math.random());
+    setShuffled(shuffledItems);
+    itemRefs.current = [];
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [media]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            document
+              .getElementById('nameBadge')
+              ?.classList.add(styles.visible);
+          } else {
+            document
+              .getElementById('nameBadge')
+              ?.classList.remove(styles.visible);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+
+    const trigger = document.getElementById('badgeTrigger');
+    if (trigger) observer.observe(trigger);
+
+    return () => {
+      if (trigger) observer.unobserve(trigger);
+    };
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add(styles.visible);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    itemRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      itemRefs.current.forEach((ref) => {
+        if (ref) observer.unobserve(ref);
+      });
+    };
+  }, [shuffled]);
+
+  const breakpoints = {
+    default: 3,
+    768: 2,
+    480: 1,
+  };
+
+  return (
+    <>
+      <Head>
+        <title>Nathan Giordano – Home</title>
+      </Head>
+
+      <main className={styles.container}>
+        <div className={styles.gridWrapper}>
+          <Masonry
+            breakpointCols={breakpoints}
+            className={styles.masonry}
+            columnClassName={styles.column}
+          >
+            {shuffled.map((src, idx) => (
+              <div
+                key={src}
+                ref={(el) => (itemRefs.current[idx] = el)}
+                className={styles.item}
+              >
+                {src.endsWith('.mp4') || src.endsWith('.mov') ? (
+                  <video src={src} autoPlay muted loop playsInline />
+                ) : (
+                  <img src={src} alt={`Home item ${idx}`} loading="lazy" />
+                )}
+              </div>
+            ))}
+          </Masonry>
+
+          {/* Badge with Reroll Button + Name */}
+          <div id="nameBadge" className={styles.nameBadge}>
+            <button
+              className={styles.rerollButton}
+              onClick={() => window.location.reload()}
+            >
+              Reroll
+            </button>
+            Nathan Giordano
+          </div>
+
+          {/* Fade overlay image */}
+          <img
+            src="/assets/fade-overlay.png"
+            alt="Fade Overlay"
+            className={styles.fadeOverlay}
+          />
+        </div>
+
+        {/* Invisible trigger for scroll fade-in */}
+        <div id="badgeTrigger" className={styles.badgeTrigger} />
+      </main>
+    </>
+  );
+}

@@ -1,0 +1,25 @@
+.nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  z-index: 1000;
+  border-bottom: 1px solid #eee;
+}
+
+.nav img {
+  height: 80px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.nav img:hover {
+  transform: scale(1.05);
+}
