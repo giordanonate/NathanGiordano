@@ -11,17 +11,21 @@ export async function getStaticProps() {
   const files = fs.readdirSync(dir);
   const media = files
     .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
-    .map(file => `/super-being/${file}`)
-    .sort(() => 0.5 - Math.random());
+    .map(file => `/super-being/${file}`);
 
   return { props: { media } };
 }
 
 export default function Superbeing({ media }) {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [shuffled, setShuffled] = useState([]);
   const itemRefs = useRef([]);
 
-  // Scroll to top on load
+  useEffect(() => {
+    const shuffledMedia = [...media].sort(() => 0.5 - Math.random());
+    setShuffled(shuffledMedia);
+  }, [media]);
+
   useEffect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
@@ -32,7 +36,6 @@ export default function Superbeing({ media }) {
     });
   }, []);
 
-  // Lazy load media in batches until page reaches 10,000px
   useEffect(() => {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
@@ -41,15 +44,14 @@ export default function Superbeing({ media }) {
       if (docHeight >= 10000) return;
 
       if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, media.length));
+        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [media.length]);
+  }, [shuffled.length]);
 
-  // Fade-in animation for media items
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -82,7 +84,7 @@ export default function Superbeing({ media }) {
     480: 1,
   };
 
-  const visibleMedia = media.slice(0, visibleCount);
+  const visibleMedia = shuffled.slice(0, visibleCount);
 
   return (
     <>

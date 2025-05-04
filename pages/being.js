@@ -11,15 +11,21 @@ export async function getStaticProps() {
   const files = fs.readdirSync(dir);
   const media = files
     .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
-    .map(file => `/being/${file}`)
-    .sort(() => 0.5 - Math.random());
+    .map(file => `/being/${file}`);
 
   return { props: { media } };
 }
 
 export default function Being({ media }) {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [shuffled, setShuffled] = useState([]);
   const itemRefs = useRef([]);
+
+  // Randomize on client
+  useEffect(() => {
+    const shuffledMedia = [...media].sort(() => 0.5 - Math.random());
+    setShuffled(shuffledMedia);
+  }, [media]);
 
   // Scroll to top on load
   useEffect(() => {
@@ -32,7 +38,7 @@ export default function Being({ media }) {
     });
   }, []);
 
-  // Lazy load media in batches until page reaches 10,000px
+  // Lazy load in batches up to 10,000px
   useEffect(() => {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
@@ -41,15 +47,15 @@ export default function Being({ media }) {
       if (docHeight >= 10000) return;
 
       if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, media.length));
+        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [media.length]);
+  }, [shuffled.length]);
 
-  // Fade-in effect when items appear
+  // Fade-in observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -82,7 +88,7 @@ export default function Being({ media }) {
     480: 1,
   };
 
-  const visibleMedia = media.slice(0, visibleCount);
+  const visibleMedia = shuffled.slice(0, visibleCount);
 
   return (
     <>
