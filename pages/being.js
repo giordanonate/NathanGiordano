@@ -22,6 +22,10 @@ export default function Being({ media }) {
   const itemRefs = useRef([]);
 
   useEffect(() => {
+    document.body.classList.remove('reloading');
+  }, []);
+
+  useEffect(() => {
     setShuffled([...media].sort(() => 0.5 - Math.random()));
   }, [media]);
 
@@ -33,13 +37,11 @@ export default function Being({ media }) {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
       const docHeight = document.body.offsetHeight;
-
       if (docHeight >= 10000) return;
       if (scrollBottom >= docHeight - 1000) {
         setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [shuffled.length]);
@@ -78,7 +80,7 @@ export default function Being({ media }) {
       <Head><title>BEING Collection</title></Head>
       <Navbar />
       <div className={styles.pageFade}></div>
-      <div style={{ height: '150px' }}></div> {/* spacer under navbar */}
+      <div style={{ height: '80px' }}></div>
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}
