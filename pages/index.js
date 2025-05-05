@@ -12,7 +12,7 @@ export async function getServerSideProps(context) {
     'no-store, no-cache, must-revalidate, proxy-revalidate'
   );
 
-  const baseDir = path.join(process.cwd(), 'public');
+  const baseDir = path.resolve('./public');
   const fallbackDirs = ['nathan-giordano', 'being', 'super-being'];
   let media = [];
 
