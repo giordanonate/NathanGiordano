@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
-import fs from 'fs';
-import path from 'path';
 import Masonry from 'react-masonry-css';
 import styles from '../styles/feed.module.css';
 import Navbar from '../components/navbar';
+import { loadMediaFromFirstAvailableFolder } from '../lib/loadMedia';
 
 export async function getServerSideProps(context) {
   context.res.setHeader(
@@ -12,23 +11,7 @@ export async function getServerSideProps(context) {
     'no-store, no-cache, must-revalidate, proxy-revalidate'
   );
 
-  const baseDir = path.resolve('./public'); // 👈 Critical fix here
-  const fallbackDirs = ['nathan-giordano', 'being', 'super-being'];
-  let media = [];
-
-  for (const folder of fallbackDirs) {
-    const dirPath = path.join(baseDir, folder);
-    if (fs.existsSync(dirPath)) {
-      const files = fs.readdirSync(dirPath);
-      const filtered = files.filter(file =>
-        file.match(/\.(jpg|jpeg|png|gif|webp|svg|mp4|webm|mov)$/i)
-      );
-      if (filtered.length) {
-        media = filtered.map(file => `/${folder}/${file}`);
-        break;
-      }
-    }
-  }
+  const media = loadMediaFromFirstAvailableFolder();
 
   return {
     props: {
