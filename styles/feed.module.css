@@ -1,6 +1,6 @@
 /* Container for whole page content */
 .container {
-  padding-top: 150px; /* Space for navbar */
+  padding-top: 0; /* ⬅️ remove this, it's now redundant */
   padding-left: 6rem;
   padding-right: 6rem;
   box-sizing: border-box;
@@ -42,76 +42,24 @@
   border-radius: 6px;
 }
 
-/* Wraps all grid and badge content */
-.gridWrapper {
-  position: relative;
+@keyframes fadeInWhite {
+  0% {
+    opacity: 1;
+    pointer-events: all;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
-/* Fixed fade overlay – slides up */
-.fadeOverlay {
+.pageFade {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  transform: translateY(100%);
-  transition: transform 0.1s linear;
-  pointer-events: none;
-  z-index: 200;
+  inset: 0;
+  background: white;
+  z-index: 10; /* 👈 behind the navbar */
+  animation: fadeInWhite 1.3s ease-out forwards;
 }
-
-.fadeOverlay {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  transform: translateY(100%);
-  transition: transform 1.0s ease-in-out;
-  pointer-events: none;
-  z-index: 200;
-}
-
-.fadeOverlay.visible {
-  transform: translateY(0%);
-}
-
-/* Trigger area for IntersectionObserver */
-.badgeTrigger {
-  height: 100px;
-  width: 100%;
-}
-
-/* Name badge with reroll */
-.nameBadge {
-  position: absolute;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Roboto Mono', monospace;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  text-align: center;
-  font-size: 1rem;
-  pointer-events: none;
-  z-index: 201;
-}
-
-.nameBadge.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.rerollButton {
-  margin-bottom: 0.4rem;
-  font-family: 'Roboto Mono', monospace;
-  font-size: 0.85rem;
-  padding: 0.3rem 0.8rem;
-  background: black;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-

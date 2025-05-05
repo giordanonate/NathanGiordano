@@ -79,6 +79,8 @@ export default function Home({ media }) {
         <title>nathangiordano.com</title>
       </Head>
       <Navbar />
+      <div className={styles.pageFade}></div>
+      <div style={{ height: '150px' }}></div> {/* space under navbar */}
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}

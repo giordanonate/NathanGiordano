@@ -75,10 +75,10 @@ export default function Superbeing({ media }) {
 
   return (
     <>
-      <Head>
-        <title>SuperBEING Collection</title>
-      </Head>
+      <Head><title>SuperBEING Collection</title></Head>
       <Navbar />
+      <div className={styles.pageFade}></div>
+      <div style={{ height: '150px' }}></div> {/* navbar space */}
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}

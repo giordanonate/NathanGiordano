@@ -75,10 +75,10 @@ export default function Being({ media }) {
 
   return (
     <>
-      <Head>
-        <title>BEING Collection</title>
-      </Head>
+      <Head><title>BEING Collection</title></Head>
       <Navbar />
+      <div className={styles.pageFade}></div>
+      <div style={{ height: '150px' }}></div> {/* spacer under navbar */}
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}
