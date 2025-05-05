@@ -19,18 +19,11 @@ function MediaItem({ src }) {
 }
 
 export default function Home({ media }) {
-  const [shuffled, setShuffled] = useState([]);
-
-  useEffect(() => {
-    const shuffledMedia = [...media].sort(() => 0.5 - Math.random());
-    setShuffled(shuffledMedia);
-  }, [media]);
-
   return (
     <div className={styles.container}>
       <Navbar />
       <div className={styles.grid}>
-        {shuffled.map((src, index) => (
+        {media.map((src, index) => (
           <MediaItem key={index} src={src} />
         ))}
       </div>
@@ -38,12 +31,13 @@ export default function Home({ media }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const dir = path.join(process.cwd(), 'public/nathan-giordano');
   const files = fs.readdirSync(dir);
   const media = files
     .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
-    .map(file => `/nathan-giordano/${file}`);
+    .map(file => `/nathan-giordano/${file}`)
+    .sort(() => 0.5 - Math.random()); // Shuffle order on each load
 
   return {
     props: {
