@@ -3,38 +3,24 @@ import Head from 'next/head';
 import Masonry from 'react-masonry-css';
 import styles from '../styles/feed.module.css';
 import Navbar from '../components/navbar';
-import { loadMediaFromFirstAvailableFolder } from '../lib/loadMedia';
 
-export async function getServerSideProps(context) {
-  context.res.setHeader(
-    'Cache-Control',
-    'no-store, no-cache, must-revalidate, proxy-revalidate'
-  );
-
-  const media = loadMediaFromFirstAvailableFolder();
-
-  return {
-    props: {
-      media: media.sort(() => 0.5 - Math.random()),
-    },
-  };
-}
-
-export default function Home({ media }) {
+export default function Home() {
+  const [media, setMedia] = useState([]);
   const [visibleCount, setVisibleCount] = useState(12);
-  const [shuffled, setShuffled] = useState([]);
   const itemRefs = useRef([]);
 
   useEffect(() => {
-    setShuffled([...media].sort(() => 0.5 - Math.random()));
-  }, [media]);
+    fetch('/api/media')
+      .then(res => res.json())
+      .then(data => setMedia(data));
+  }, []);
 
   useEffect(() => {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual';
     }
     requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, []);
+  }, [media]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,12 +28,12 @@ export default function Home({ media }) {
       const docHeight = document.body.offsetHeight;
       if (docHeight >= 10000) return;
       if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
+        setVisibleCount(prev => Math.min(prev + 12, media.length));
       }
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [shuffled.length]);
+  }, [media.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -73,10 +59,10 @@ export default function Home({ media }) {
         }
       });
     }, 50);
-  }, [shuffled]);
+  }, [media]);
 
   const breakpoints = { default: 3, 768: 2, 480: 1 };
-  const visibleMedia = shuffled.slice(0, visibleCount);
+  const visibleMedia = media.slice(0, visibleCount);
 
   return (
     <>
