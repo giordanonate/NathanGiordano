@@ -18,8 +18,16 @@
   transition: transform 0.2s ease;
   padding-left: 1rem;
   padding-right: 1rem;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 .nav img:hover {
   transform: scale(1.05);
+}
+
+/* Disable clicks during fade */
+body.reloading .nav img {
+  pointer-events: none;
+  opacity: 0.5;
 }

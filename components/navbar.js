@@ -7,9 +7,9 @@ export default function Navbar() {
 
   const handleNav = (target) => {
     if (router.pathname === target) {
-      triggerFadeReload(); // same page, reload with fade
+      triggerFadeReload(router);
     } else {
-      router.push(target); // different page
+      router.push(target);
     }
   };
 
@@ -18,22 +18,22 @@ export default function Navbar() {
       <img
         src="/assets/nav/home-1.png"
         alt="Home"
-        onClick={() => handleNav('/')}
+        onClick={(e) => { e.preventDefault(); handleNav('/'); }}
       />
       <img
         src="/assets/nav/sketch-1.png"
         alt="Sketchbook"
-        onClick={() => handleNav('/sketchbook')}
+        onClick={(e) => { e.preventDefault(); handleNav('/sketchbook'); }}
       />
       <img
         src="/assets/nav/being-1.png"
         alt="BEING"
-        onClick={() => handleNav('/being')}
+        onClick={(e) => { e.preventDefault(); handleNav('/being'); }}
       />
       <img
         src="/assets/nav/superbeing-1.png"
         alt="SUPERBEING"
-        onClick={() => handleNav('/superbeing')}
+        onClick={(e) => { e.preventDefault(); handleNav('/superbeing'); }}
       />
       <a
         href="https://lightwork.art"
