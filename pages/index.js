@@ -12,7 +12,7 @@ export async function getServerSideProps(context) {
     'no-store, no-cache, must-revalidate, proxy-revalidate'
   );
 
-  const baseDir = path.resolve('./public');
+  const baseDir = path.resolve('./public'); // 👈 Critical fix here
   const fallbackDirs = ['nathan-giordano', 'being', 'super-being'];
   let media = [];
 
@@ -43,8 +43,7 @@ export default function Home({ media }) {
   const itemRefs = useRef([]);
 
   useEffect(() => {
-    const shuffledMedia = [...media].sort(() => 0.5 - Math.random());
-    setShuffled(shuffledMedia);
+    setShuffled([...media].sort(() => 0.5 - Math.random()));
   }, [media]);
 
   useEffect(() => {
@@ -58,45 +57,31 @@ export default function Home({ media }) {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
       const docHeight = document.body.offsetHeight;
-
       if (docHeight >= 10000) return;
-
       if (scrollBottom >= docHeight - 1000) {
         setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [shuffled.length]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (
-            entry.isIntersecting &&
-            !entry.target.classList.contains(styles.visible)
-          ) {
-            entry.target.classList.add(styles.visible);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    itemRefs.current.forEach(ref => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      itemRefs.current.forEach(ref => {
-        if (ref) observer.unobserve(ref);
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (
+          entry.isIntersecting &&
+          !entry.target.classList.contains(styles.visible)
+        ) {
+          entry.target.classList.add(styles.visible);
+        }
       });
-    };
+    }, { threshold: 0.1 });
+
+    itemRefs.current.forEach(ref => ref && observer.observe(ref));
+    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref));
   }, [visibleCount]);
 
-  // 👇 NEW: Fade in the first visible batch right after mount
   useEffect(() => {
     setTimeout(() => {
       itemRefs.current.slice(0, visibleCount).forEach(ref => {
@@ -104,15 +89,10 @@ export default function Home({ media }) {
           ref.classList.add(styles.visible);
         }
       });
-    }, 50); // small delay so CSS transition works
+    }, 50);
   }, [shuffled]);
 
-  const breakpoints = {
-    default: 3,
-    768: 2,
-    480: 1,
-  };
-
+  const breakpoints = { default: 3, 768: 2, 480: 1 };
   const visibleMedia = shuffled.slice(0, visibleCount);
 
   return (
@@ -131,7 +111,7 @@ export default function Home({ media }) {
             <div
               key={src}
               ref={el => (itemRefs.current[idx] = el)}
-              className={styles.item} // fade-in will be applied by JS
+              className={styles.item}
             >
               {src.match(/\.(mp4|webm|mov)$/i) ? (
                 <video src={src} autoPlay muted loop playsInline />
