@@ -1,39 +1,48 @@
 import { useEffect, useRef, useState } from 'react';
 import Head from 'next/head';
+import path from 'path';
+import fs from 'fs';
 import Masonry from 'react-masonry-css';
 import styles from '../styles/feed.module.css';
 import Navbar from '../components/navbar';
 
-export default function Home() {
-  const [media, setMedia] = useState([]);
+export async function getStaticProps() {
+  const dir = path.join(process.cwd(), 'public/nathan-giordano');
+  const files = fs.readdirSync(dir);
+  const media = files
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .map(file => `/nathan-giordano/${file}`);
+
+  return { props: { media } };
+}
+
+export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12);
+  const [shuffled, setShuffled] = useState([]);
   const itemRefs = useRef([]);
 
   useEffect(() => {
-    fetch('/api/media')
-      .then(res => res.json())
-      .then(data => setMedia(data));
-  }, []);
+    setShuffled([...media].sort(() => 0.5 - Math.random()));
+  }, [media]);
 
   useEffect(() => {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
     requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, [media]);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
       const docHeight = document.body.offsetHeight;
+
       if (docHeight >= 10000) return;
       if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, media.length));
+        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [media.length]);
+  }, [shuffled.length]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -59,10 +68,10 @@ export default function Home() {
         }
       });
     }, 50);
-  }, [media]);
+  }, [shuffled]);
 
   const breakpoints = { default: 3, 768: 2, 480: 1 };
-  const visibleMedia = media.slice(0, visibleCount);
+  const visibleMedia = shuffled.slice(0, visibleCount);
 
   return (
     <>
@@ -82,7 +91,7 @@ export default function Home() {
               ref={el => (itemRefs.current[idx] = el)}
               className={styles.item}
             >
-              {src.match(/\.(mp4|webm|mov)$/i) ? (
+              {src.match(/\.(mp4|mov)$/i) ? (
                 <video src={src} autoPlay muted loop playsInline />
               ) : (
                 <img src={src} alt={`media ${idx}`} loading="lazy" />
