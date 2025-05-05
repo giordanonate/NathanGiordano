@@ -21,31 +21,20 @@ export default function Being({ media }) {
   const [shuffled, setShuffled] = useState([]);
   const itemRefs = useRef([]);
 
-  // Randomize on client
   useEffect(() => {
-    const shuffledMedia = [...media].sort(() => 0.5 - Math.random());
-    setShuffled(shuffledMedia);
+    setShuffled([...media].sort(() => 0.5 - Math.random()));
   }, [media]);
 
-  // Scroll to top on load
   useEffect(() => {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual';
-    }
-
-    requestAnimationFrame(() => {
-      window.scrollTo(0, 0);
-    });
+    requestAnimationFrame(() => window.scrollTo(0, 0));
   }, []);
 
-  // Lazy load in batches up to 10,000px
   useEffect(() => {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY;
       const docHeight = document.body.offsetHeight;
 
       if (docHeight >= 10000) return;
-
       if (scrollBottom >= docHeight - 1000) {
         setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
       }
@@ -55,39 +44,33 @@ export default function Being({ media }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [shuffled.length]);
 
-  // Fade-in observer
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (
-            entry.isIntersecting &&
-            !entry.target.classList.contains(styles.visible)
-          ) {
-            entry.target.classList.add(styles.visible);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    itemRefs.current.forEach(ref => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      itemRefs.current.forEach(ref => {
-        if (ref) observer.unobserve(ref);
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (
+          entry.isIntersecting &&
+          !entry.target.classList.contains(styles.visible)
+        ) {
+          entry.target.classList.add(styles.visible);
+        }
       });
-    };
+    }, { threshold: 0.1 });
+
+    itemRefs.current.forEach(ref => ref && observer.observe(ref));
+    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref));
   }, [visibleCount]);
 
-  const breakpoints = {
-    default: 3,
-    768: 2,
-    480: 1,
-  };
+  useEffect(() => {
+    setTimeout(() => {
+      itemRefs.current.slice(0, visibleCount).forEach(ref => {
+        if (ref && !ref.classList.contains(styles.visible)) {
+          ref.classList.add(styles.visible);
+        }
+      });
+    }, 50);
+  }, [shuffled]);
 
+  const breakpoints = { default: 3, 768: 2, 480: 1 };
   const visibleMedia = shuffled.slice(0, visibleCount);
 
   return (
@@ -108,7 +91,7 @@ export default function Being({ media }) {
               ref={el => (itemRefs.current[idx] = el)}
               className={styles.item}
             >
-              {src.endsWith('.mp4') || src.endsWith('.mov') ? (
+              {src.match(/\.(mp4|mov)$/i) ? (
                 <video src={src} autoPlay muted loop playsInline />
               ) : (
                 <img src={src} alt={`BEING ${idx}`} loading="lazy" />
