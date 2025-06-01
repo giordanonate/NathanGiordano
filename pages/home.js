@@ -78,7 +78,13 @@ export default function Home({ media }) {
 
   return (
     <>
-      <Head><title>nathangiordano.com</title></Head>
+      <Head>
+        <title>nathangiordano.com</title>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap"
+          rel="stylesheet"
+        />
+      </Head>
       <Navbar />
       <HomeFadeInOverlay />
       <div style={{ height: '80px' }}></div>
@@ -88,19 +94,25 @@ export default function Home({ media }) {
           className={styles.masonry}
           columnClassName={styles.column}
         >
-          {visibleMedia.map((src, idx) => (
-            <div
-              key={src}
-              ref={el => (itemRefs.current[idx] = el)}
-              className={styles.item}
-            >
-              {src.match(/\.(mp4|mov)$/i) ? (
-                <video src={src} autoPlay muted loop playsInline />
-              ) : (
-                <img src={src} alt={`media ${idx}`} loading="lazy" />
-              )}
-            </div>
-          ))}
+          {visibleMedia.map((src, idx) => {
+            const fileName = src.split('/').pop().split('.').slice(0, -1).join('.')
+            return (
+              <div
+                key={src}
+                ref={el => (itemRefs.current[idx] = el)}
+                className={styles.item}
+              >
+                <div className={styles.mediaWrapper}>
+                  {src.match(/\.(mp4|mov)$/i) ? (
+                    <video src={src} autoPlay muted loop playsInline preload="none" />
+                  ) : (
+                    <img src={src} alt={`media ${idx}`} loading="lazy" />
+                  )}
+                  <p className={styles.caption}>{fileName}</p>
+                </div>
+              </div>
+            )
+          })}
         </Masonry>
       </main>
     </>
