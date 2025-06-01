@@ -165,7 +165,7 @@ export default function EarthCanvas() {
       clouds.rotation.y += velocity
       velocity *= 0.95 // friction to slow down
 
-      spotLight.position.lerp(targetLightPos, 0.02)
+      spotLight.position.lerp(targetLightPos, 0.04)
       spotLight.target.position.set(0, 0, 0)
 
       composer.render()
