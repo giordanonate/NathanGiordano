@@ -8,16 +8,11 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass'
 export default function EarthCanvas() {
   const mountRef = useRef(null)
   const isHoveringRef = useRef(false)
+  const spinMultiplier = useRef(1)
 
   useEffect(() => {
     const mount = mountRef.current
     if (!mount) return
-
-    document.body.classList.add('locked')
-
-    const spinMultiplier = { current: 1.0 }
-    let lastTouchX = null
-    let velocity = 0
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color('#ffffff')
@@ -32,18 +27,20 @@ export default function EarthCanvas() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(mount.clientWidth, mount.clientHeight)
-    renderer.setPixelRatio(window.innerWidth < 768 ? 1.5 : window.devicePixelRatio)
+    renderer.setPixelRatio(window.devicePixelRatio)
     mount.appendChild(renderer.domElement)
 
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
-    composer.addPass(new BokehPass(scene, camera, {
-      focus: 2.7,
-      aperture: window.innerWidth < 768 ? 0.06 : 0.025,
-      maxblur: window.innerWidth < 768 ? 0.03 : 0.01,
-      width: mount.clientWidth,
-      height: mount.clientHeight
-    }))
+    composer.addPass(
+      new BokehPass(scene, camera, {
+        focus: 2.7,
+        aperture: 0.025,
+        maxblur: 0.01,
+        width: mount.clientWidth,
+        height: mount.clientHeight
+      })
+    )
 
     const spotLight = new THREE.SpotLight(0xffddaa, 50, 0, Math.PI / 1, 0.1)
     spotLight.position.set(0, 0, 50)
@@ -60,6 +57,7 @@ export default function EarthCanvas() {
     const emissiveMap = loader.load('/earthlights1k.jpg')
     const cloudMap = loader.load('/earthcloudmap.jpg')
     const alphaMap = loader.load('/earthcloudmaptrans.jpg')
+
     const textures = [colorMap, specMap, emissiveMap, cloudMap, alphaMap]
 
     const earthMaterial = new THREE.MeshPhongMaterial({
@@ -92,11 +90,16 @@ export default function EarthCanvas() {
     const mouse = new THREE.Vector2()
     const targetLightPos = new THREE.Vector3(0, 0, 5)
 
+    const updateLightFromPointer = (x, y) => {
+      const radius = 5
+      targetLightPos.set(radius * x, radius * y, 5)
+    }
+
     const handleMouseMove = (event) => {
       const rect = mount.getBoundingClientRect()
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-      targetLightPos.set(5 * x, 5 * y, 5)
+      updateLightFromPointer(x, y)
 
       mouse.set(x, y)
       raycaster.setFromCamera(mouse, camera)
@@ -109,6 +112,15 @@ export default function EarthCanvas() {
         mount.style.cursor = 'default'
         isHoveringRef.current = false
       }
+    }
+
+    const handleTouchMove = (event) => {
+      if (!event.touches.length) return
+      const touch = event.touches[0]
+      const rect = mount.getBoundingClientRect()
+      const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1
+      const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1
+      updateLightFromPointer(x, y)
     }
 
     const handleClick = () => {
@@ -126,63 +138,29 @@ export default function EarthCanvas() {
       composer.setSize(mount.clientWidth, mount.clientHeight)
     }
 
-    const handleTouchStart = (e) => {
-      isHoveringRef.current = true
-      if (e.touches.length === 1) {
-        lastTouchX = e.touches[0].clientX
-        velocity = 0
-      }
-    }
-
-    const handleTouchMove = (e) => {
-      if (e.touches.length === 1 && lastTouchX !== null) {
-        const currentX = e.touches[0].clientX
-        const deltaX = currentX - lastTouchX
-        lastTouchX = currentX
-
-        const rotationDelta = deltaX * 0.005
-        earth.rotation.y += rotationDelta
-        clouds.rotation.y += rotationDelta
-        velocity = rotationDelta
-      }
-    }
-
-    const handleTouchEnd = () => {
-      lastTouchX = null
-      isHoveringRef.current = false
-    }
-
     const animate = () => {
-      const targetMultiplier = isHoveringRef.current ? 1.5 : 1.0
-      spinMultiplier.current = THREE.MathUtils.lerp(spinMultiplier.current, targetMultiplier, 0.05)
+      const target = isHoveringRef.current ? 1.5 : 1
+      spinMultiplier.current = THREE.MathUtils.lerp(spinMultiplier.current, target, 0.05)
 
-      earth.rotation.y += 0.002 * spinMultiplier.current + velocity
-      clouds.rotation.y += 0.003 * spinMultiplier.current + velocity
-      velocity *= 0.95
+      earth.rotation.y += 0.002 * spinMultiplier.current
+      clouds.rotation.y += 0.003 * spinMultiplier.current
 
-      spotLight.position.lerp(targetLightPos, 0.04)
-      spotLight.target.position.set(0, 0, 0)
-
+      spotLight.position.lerp(targetLightPos, 0.05)
       composer.render()
       requestAnimationFrame(animate)
     }
     animate()
 
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
     window.addEventListener('resize', handleResize)
     window.addEventListener('click', handleClick)
-    window.addEventListener('touchstart', handleTouchStart)
-    window.addEventListener('touchmove', handleTouchMove)
-    window.addEventListener('touchend', handleTouchEnd)
 
     return () => {
-      document.body.classList.remove('locked')
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('click', handleClick)
-      window.removeEventListener('touchstart', handleTouchStart)
-      window.removeEventListener('touchmove', handleTouchMove)
-      window.removeEventListener('touchend', handleTouchEnd)
       if (renderer?.domElement && mount.contains(renderer.domElement)) {
         mount.removeChild(renderer.domElement)
       }
@@ -193,7 +171,6 @@ export default function EarthCanvas() {
   return (
     <div
       ref={mountRef}
-      className="earth-fade"
       style={{
         width: '100%',
         height: '100%',
