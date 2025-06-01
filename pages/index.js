@@ -1,107 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
-import path from 'path';
-import fs from 'fs';
-import Masonry from 'react-masonry-css';
-import styles from '../styles/feed.module.css';
-import Navbar from '../components/navbar';
+'use client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
+import dynamic from 'next/dynamic'
 
-export async function getStaticProps() {
-  const dir = path.join(process.cwd(), 'public/nathan-giordano');
-  const files = fs.readdirSync(dir);
-  const media = files
-    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
-    .map(file => `/nathan-giordano/${file}`);
+const EarthCanvas = dynamic(() => import('../components/EarthCanvas'), { ssr: false })
 
-  return { props: { media } };
-}
-
-export default function Home({ media }) {
-  const [visibleCount, setVisibleCount] = useState(12);
-  const [shuffled, setShuffled] = useState([]);
-  const itemRefs = useRef([]);
+export default function IndexPage() {
+  const router = useRouter()
 
   useEffect(() => {
-    setShuffled([...media].sort(() => 0.5 - Math.random()));
-  }, [media]);
-
-  useEffect(() => {
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollBottom = window.innerHeight + window.scrollY;
-      const docHeight = document.body.offsetHeight;
-
-      if (docHeight >= 10000) return;
-      if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [shuffled.length]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (
-          entry.isIntersecting &&
-          !entry.target.classList.contains(styles.visible)
-        ) {
-          entry.target.classList.add(styles.visible);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    itemRefs.current.forEach(ref => ref && observer.observe(ref));
-    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref));
-  }, [visibleCount]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      itemRefs.current.slice(0, visibleCount).forEach(ref => {
-        if (ref && !ref.classList.contains(styles.visible)) {
-          ref.classList.add(styles.visible);
-        }
-      });
-    }, 50);
-  }, [shuffled]);
-
-  const breakpoints = { default: 3, 768: 2, 480: 1 };
-  const visibleMedia = shuffled.slice(0, visibleCount);
+    const handleEarthClick = () => router.push('/home')
+    window.addEventListener('earth-click', handleEarthClick)
+    return () => window.removeEventListener('earth-click', handleEarthClick)
+  }, [router])
 
   return (
-    <>
-      <Head>
-        <title>nathangiordano.com</title>
-      </Head>
-      <Navbar />
-      <div className={styles.pageFade}></div>
-      <div style={{ height: '150px' }}></div> {/* space under navbar */}
-      <main className={styles.container}>
-        <Masonry
-          breakpointCols={breakpoints}
-          className={styles.masonry}
-          columnClassName={styles.column}
-        >
-          {visibleMedia.map((src, idx) => (
-            <div
-              key={src}
-              ref={el => (itemRefs.current[idx] = el)}
-              className={styles.item}
-            >
-              {src.match(/\.(mp4|mov)$/i) ? (
-                <video src={src} autoPlay muted loop playsInline />
-              ) : (
-                <img src={src} alt={`media ${idx}`} loading="lazy" />
-              )}
-            </div>
-          ))}
-        </Masonry>
-      </main>
-    </>
-  );
+    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden' }}>
+      <EarthCanvas />
+    </div>
+  )
 }
