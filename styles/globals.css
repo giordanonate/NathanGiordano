@@ -24,3 +24,17 @@ body.reloading .nav img {
 body.reloading .nav img:hover {
   transform: none !important;
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  scroll-behavior: smooth;
+}
+
+body.locked {
+  overflow: hidden !important;
+  height: 100%;
+  touch-action: none;
+}

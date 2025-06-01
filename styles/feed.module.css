@@ -1,6 +1,6 @@
 /* Container for whole page content */
 .container {
-  padding-top: 0; /* ⬅️ remove this, it's now redundant */
+  padding-top: 5rem; /* ⬅️ remove this, it's now redundant */
   padding-left: 6rem;
   padding-right: 6rem;
   box-sizing: border-box;

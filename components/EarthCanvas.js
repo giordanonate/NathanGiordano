@@ -13,9 +13,12 @@ export default function EarthCanvas() {
     const mount = mountRef.current
     if (!mount) return
 
+    // ✅ Disable scroll on EarthCanvas entry
+    document.body.classList.add('locked')
+
     const spinMultiplier = { current: 1.0 }
     let lastTouchX = null
-    let velocity = 0 // mobile spin velocity
+    let velocity = 0
 
     const scene = new THREE.Scene()
     scene.background = new THREE.Color('#ffffff')
@@ -30,15 +33,19 @@ export default function EarthCanvas() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(mount.clientWidth, mount.clientHeight)
-    renderer.setPixelRatio(window.devicePixelRatio)
+
+    const isMobile = window.innerWidth < 768
+    const maxPixelRatio = isMobile ? 1.5 : window.devicePixelRatio
+    renderer.setPixelRatio(maxPixelRatio)
+
     mount.appendChild(renderer.domElement)
 
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(new BokehPass(scene, camera, {
       focus: 2.7,
-      aperture: 0.025,
-      maxblur: 0.01,
+      aperture: isMobile ? 0.06 : 0.025,
+      maxblur: isMobile ? 0.03 : 0.01,
       width: mount.clientWidth,
       height: mount.clientHeight
     }))
@@ -123,7 +130,9 @@ export default function EarthCanvas() {
       camera.aspect = mount.clientWidth / mount.clientHeight
       camera.updateProjectionMatrix()
       renderer.setSize(mount.clientWidth, mount.clientHeight)
-      renderer.setPixelRatio(window.devicePixelRatio)
+
+      const newPixelRatio = window.innerWidth < 768 ? 1.5 : window.devicePixelRatio
+      renderer.setPixelRatio(newPixelRatio)
       composer.setSize(mount.clientWidth, mount.clientHeight)
     }
 
@@ -131,7 +140,7 @@ export default function EarthCanvas() {
       isHoveringRef.current = true
       if (e.touches.length === 1) {
         lastTouchX = e.touches[0].clientX
-        velocity = 0 // reset velocity on new touch
+        velocity = 0
       }
     }
 
@@ -144,7 +153,7 @@ export default function EarthCanvas() {
         const rotationDelta = deltaX * 0.005
         earth.rotation.y += rotationDelta
         clouds.rotation.y += rotationDelta
-        velocity = rotationDelta // update current velocity
+        velocity = rotationDelta
       }
     }
 
@@ -160,10 +169,9 @@ export default function EarthCanvas() {
       earth.rotation.y += 0.002 * spinMultiplier.current
       clouds.rotation.y += 0.003 * spinMultiplier.current
 
-      // apply inertia velocity (mobile)
       earth.rotation.y += velocity
       clouds.rotation.y += velocity
-      velocity *= 0.95 // friction to slow down
+      velocity *= 0.95
 
       spotLight.position.lerp(targetLightPos, 0.04)
       spotLight.target.position.set(0, 0, 0)
@@ -181,6 +189,9 @@ export default function EarthCanvas() {
     window.addEventListener('touchend', handleTouchEnd)
 
     return () => {
+      // ✅ Restore scroll on page exit
+      document.body.classList.remove('locked')
+
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('click', handleClick)
