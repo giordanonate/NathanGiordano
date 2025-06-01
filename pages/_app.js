@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import TransitionOverlay from '@/components/TransitionOverlay';
 import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }) {
@@ -14,7 +15,7 @@ export default function MyApp({ Component, pageProps }) {
       }
     };
 
-    // Check on initial load
+    // Handle on first load
     handleRouteChange(router.pathname);
 
     router.events.on('routeChangeComplete', handleRouteChange);
@@ -24,8 +25,11 @@ export default function MyApp({ Component, pageProps }) {
   }, [router]);
 
   return (
-    <div className="pageWrapper">
-      <Component {...pageProps} />
-    </div>
+    <>
+      <TransitionOverlay />
+      <div className="pageWrapper">
+        <Component {...pageProps} />
+      </div>
+    </>
   );
 }

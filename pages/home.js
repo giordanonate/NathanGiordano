@@ -1,51 +1,51 @@
-import { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
-import path from 'path';
-import fs from 'fs';
-import Masonry from 'react-masonry-css';
-import styles from '../styles/feed.module.css';
-import Navbar from '../components/navbar';
+import { useEffect, useRef, useState } from 'react'
+import Head from 'next/head'
+import path from 'path'
+import fs from 'fs'
+import Masonry from 'react-masonry-css'
+import styles from '../styles/feed.module.css'
+import Navbar from '../components/navbar'
+import HomeFadeInOverlay from '../components/HomeFadeInOverlay'
 
 export async function getStaticProps() {
-  const dir = path.join(process.cwd(), 'public/nathan-giordano');
-  const files = fs.readdirSync(dir);
+  const dir = path.join(process.cwd(), 'public/nathan-giordano')
+  const files = fs.readdirSync(dir)
   const media = files
     .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
-    .map(file => `/nathan-giordano/${file}`);
+    .map(file => `/nathan-giordano/${file}`)
 
-  return { props: { media } };
+  return { props: { media } }
 }
 
 export default function Home({ media }) {
-  const [visibleCount, setVisibleCount] = useState(12);
-  const [shuffled, setShuffled] = useState([]);
-  const itemRefs = useRef([]);
-
-  // ✅ clear interaction lock on mount
-  useEffect(() => {
-    document.body.classList.remove('reloading');
-  }, []);
+  const [visibleCount, setVisibleCount] = useState(12)
+  const [shuffled, setShuffled] = useState([])
+  const itemRefs = useRef([])
 
   useEffect(() => {
-    setShuffled([...media].sort(() => 0.5 - Math.random()));
-  }, [media]);
+    document.body.classList.remove('reloading')
+  }, [])
 
   useEffect(() => {
-    requestAnimationFrame(() => window.scrollTo(0, 0));
-  }, []);
+    setShuffled([...media].sort(() => 0.5 - Math.random()))
+  }, [media])
+
+  useEffect(() => {
+    requestAnimationFrame(() => window.scrollTo(0, 0))
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
-      const scrollBottom = window.innerHeight + window.scrollY;
-      const docHeight = document.body.offsetHeight;
-      if (docHeight >= 10000) return;
+      const scrollBottom = window.innerHeight + window.scrollY
+      const docHeight = document.body.offsetHeight
+      if (docHeight >= 10000) return
       if (scrollBottom >= docHeight - 1000) {
-        setVisibleCount(prev => Math.min(prev + 12, shuffled.length));
+        setVisibleCount(prev => Math.min(prev + 12, shuffled.length))
       }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [shuffled.length]);
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [shuffled.length])
 
   useEffect(() => {
     const observer = new IntersectionObserver(entries => {
@@ -54,33 +54,33 @@ export default function Home({ media }) {
           entry.isIntersecting &&
           !entry.target.classList.contains(styles.visible)
         ) {
-          entry.target.classList.add(styles.visible);
+          entry.target.classList.add(styles.visible)
         }
-      });
-    }, { threshold: 0.1 });
+      })
+    }, { threshold: 0.1 })
 
-    itemRefs.current.forEach(ref => ref && observer.observe(ref));
-    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref));
-  }, [visibleCount]);
+    itemRefs.current.forEach(ref => ref && observer.observe(ref))
+    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref))
+  }, [visibleCount])
 
   useEffect(() => {
     setTimeout(() => {
       itemRefs.current.slice(0, visibleCount).forEach(ref => {
         if (ref && !ref.classList.contains(styles.visible)) {
-          ref.classList.add(styles.visible);
+          ref.classList.add(styles.visible)
         }
-      });
-    }, 50);
-  }, [shuffled]);
+      })
+    }, 50)
+  }, [shuffled])
 
-  const breakpoints = { default: 3, 768: 2, 480: 1 };
-  const visibleMedia = shuffled.slice(0, visibleCount);
+  const breakpoints = { default: 3, 768: 2, 480: 1 }
+  const visibleMedia = shuffled.slice(0, visibleCount)
 
   return (
     <>
       <Head><title>nathangiordano.com</title></Head>
       <Navbar />
-      <div className={styles.pageFade}></div>
+      <HomeFadeInOverlay />
       <div style={{ height: '80px' }}></div>
       <main className={styles.container}>
         <Masonry
@@ -104,5 +104,5 @@ export default function Home({ media }) {
         </Masonry>
       </main>
     </>
-  );
+  )
 }

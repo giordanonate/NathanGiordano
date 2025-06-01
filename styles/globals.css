@@ -38,3 +38,34 @@ body.locked {
   height: 100%;
   touch-action: none;
 }
+
+.earth-fade {
+  animation: fadeIn 2s ease-out;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.transition-overlay {
+  position: fixed;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease-in-out;
+  z-index: 10;
+}
+
+.transition-overlay.fade-in {
+  opacity: 1;
+}
+
+.transition-overlay.fade-out {
+  opacity: 0;
+}
+

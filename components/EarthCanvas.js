@@ -13,7 +13,6 @@ export default function EarthCanvas() {
     const mount = mountRef.current
     if (!mount) return
 
-    // ✅ Disable scroll on EarthCanvas entry
     document.body.classList.add('locked')
 
     const spinMultiplier = { current: 1.0 }
@@ -33,19 +32,15 @@ export default function EarthCanvas() {
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(mount.clientWidth, mount.clientHeight)
-
-    const isMobile = window.innerWidth < 768
-    const maxPixelRatio = isMobile ? 1.5 : window.devicePixelRatio
-    renderer.setPixelRatio(maxPixelRatio)
-
+    renderer.setPixelRatio(window.innerWidth < 768 ? 1.5 : window.devicePixelRatio)
     mount.appendChild(renderer.domElement)
 
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(new BokehPass(scene, camera, {
       focus: 2.7,
-      aperture: isMobile ? 0.06 : 0.025,
-      maxblur: isMobile ? 0.03 : 0.01,
+      aperture: window.innerWidth < 768 ? 0.06 : 0.025,
+      maxblur: window.innerWidth < 768 ? 0.03 : 0.01,
       width: mount.clientWidth,
       height: mount.clientHeight
     }))
@@ -65,7 +60,6 @@ export default function EarthCanvas() {
     const emissiveMap = loader.load('/earthlights1k.jpg')
     const cloudMap = loader.load('/earthcloudmap.jpg')
     const alphaMap = loader.load('/earthcloudmaptrans.jpg')
-
     const textures = [colorMap, specMap, emissiveMap, cloudMap, alphaMap]
 
     const earthMaterial = new THREE.MeshPhongMaterial({
@@ -102,8 +96,7 @@ export default function EarthCanvas() {
       const rect = mount.getBoundingClientRect()
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-      const radius = 5
-      targetLightPos.set(radius * x, radius * y, 5)
+      targetLightPos.set(5 * x, 5 * y, 5)
 
       mouse.set(x, y)
       raycaster.setFromCamera(mouse, camera)
@@ -130,9 +123,6 @@ export default function EarthCanvas() {
       camera.aspect = mount.clientWidth / mount.clientHeight
       camera.updateProjectionMatrix()
       renderer.setSize(mount.clientWidth, mount.clientHeight)
-
-      const newPixelRatio = window.innerWidth < 768 ? 1.5 : window.devicePixelRatio
-      renderer.setPixelRatio(newPixelRatio)
       composer.setSize(mount.clientWidth, mount.clientHeight)
     }
 
@@ -166,11 +156,8 @@ export default function EarthCanvas() {
       const targetMultiplier = isHoveringRef.current ? 1.5 : 1.0
       spinMultiplier.current = THREE.MathUtils.lerp(spinMultiplier.current, targetMultiplier, 0.05)
 
-      earth.rotation.y += 0.002 * spinMultiplier.current
-      clouds.rotation.y += 0.003 * spinMultiplier.current
-
-      earth.rotation.y += velocity
-      clouds.rotation.y += velocity
+      earth.rotation.y += 0.002 * spinMultiplier.current + velocity
+      clouds.rotation.y += 0.003 * spinMultiplier.current + velocity
       velocity *= 0.95
 
       spotLight.position.lerp(targetLightPos, 0.04)
@@ -189,20 +176,16 @@ export default function EarthCanvas() {
     window.addEventListener('touchend', handleTouchEnd)
 
     return () => {
-      // ✅ Restore scroll on page exit
       document.body.classList.remove('locked')
-
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('click', handleClick)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
-
       if (renderer?.domElement && mount.contains(renderer.domElement)) {
         mount.removeChild(renderer.domElement)
       }
-
       textures.forEach(t => t.dispose?.())
     }
   }, [])
@@ -210,6 +193,7 @@ export default function EarthCanvas() {
   return (
     <div
       ref={mountRef}
+      className="earth-fade"
       style={{
         width: '100%',
         height: '100%',

@@ -1,17 +1,26 @@
-import { useRouter } from 'next/router';
-import styles from './navbar.module.css';
-import { triggerFadeReload } from '../lib/triggerFadeReload';
+import { useRouter } from 'next/router'
+import styles from './navbar.module.css'
+
+let isTransitioning = false
 
 export default function Navbar() {
-  const router = useRouter();
+  const router = useRouter()
 
   const handleNav = (target) => {
+    if (isTransitioning) return
+
+    isTransitioning = true
+    setTimeout(() => {
+      isTransitioning = false
+    }, 2400) // duration of full transition cycle (fade out + hold + fade in)
+
     if (router.pathname === target) {
-      triggerFadeReload(router);
+      const fakeRoute = `${target}?refresh=${Date.now()}`
+      window.dispatchEvent(new CustomEvent('start-transition', { detail: fakeRoute }))
     } else {
-      router.push(target);
+      window.dispatchEvent(new CustomEvent('start-transition', { detail: target }))
     }
-  };
+  }
 
   return (
     <nav className={styles.nav}>
@@ -46,5 +55,5 @@ export default function Navbar() {
         />
       </a>
     </nav>
-  );
+  )
 }
