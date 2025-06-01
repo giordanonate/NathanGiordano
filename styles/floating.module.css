@@ -1,0 +1,24 @@
+.floatingGallery {
+  position: relative;
+  min-height: 300vh;
+  perspective: 1000px;
+  overflow-x: hidden;
+}
+
+.floatingItem {
+  position: absolute;
+  transition: opacity 0.8s ease;
+  opacity: 1;
+  will-change: transform, top, left;
+  touch-action: none;
+  cursor: grab;
+  scale: .3;
+}
+
+.floatingItem:active {
+  cursor: grabbing;
+}
+
+.visible {
+  opacity: 1;
+}

@@ -27,7 +27,7 @@ export default function Navbar() {
       <img
         src="/assets/nav/home-1.png"
         alt="Home"
-        onClick={(e) => { e.preventDefault(); handleNav('/'); }}
+        onClick={(e) => { e.preventDefault(); handleNav('/home'); }}
       />
       <img
         src="/assets/nav/sketch-1.png"
