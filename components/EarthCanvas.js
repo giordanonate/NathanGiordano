@@ -7,8 +7,11 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass'
 
 export default function EarthCanvas() {
   const mountRef = useRef(null)
-  const isHoveringRef = useRef(false)
-  const spinMultiplier = useRef(1)
+  const spinVelocity = useRef(0)
+  const lastTouchX = useRef(null)
+  const spin = useRef(0)
+  const lightTarget = useRef(new THREE.Vector3(0, 0, 5))
+  const rendererRef = useRef(null)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -29,6 +32,7 @@ export default function EarthCanvas() {
     renderer.setSize(mount.clientWidth, mount.clientHeight)
     renderer.setPixelRatio(window.devicePixelRatio)
     mount.appendChild(renderer.domElement)
+    rendererRef.current = renderer
 
     const composer = new EffectComposer(renderer)
     composer.addPass(new RenderPass(scene, camera))
@@ -57,7 +61,6 @@ export default function EarthCanvas() {
     const emissiveMap = loader.load('/earthlights1k.jpg')
     const cloudMap = loader.load('/earthcloudmap.jpg')
     const alphaMap = loader.load('/earthcloudmaptrans.jpg')
-
     const textures = [colorMap, specMap, emissiveMap, cloudMap, alphaMap]
 
     const earthMaterial = new THREE.MeshPhongMaterial({
@@ -88,39 +91,36 @@ export default function EarthCanvas() {
 
     const raycaster = new THREE.Raycaster()
     const mouse = new THREE.Vector2()
-    const targetLightPos = new THREE.Vector3(0, 0, 5)
 
-    const updateLightFromPointer = (x, y) => {
+    const updateLightFromXY = (x, y) => {
       const radius = 5
-      targetLightPos.set(radius * x, radius * y, 5)
+      lightTarget.current.set(radius * x, radius * y, 5)
     }
 
     const handleMouseMove = (event) => {
       const rect = mount.getBoundingClientRect()
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-      updateLightFromPointer(x, y)
-
-      mouse.set(x, y)
-      raycaster.setFromCamera(mouse, camera)
-      const intersects = raycaster.intersectObject(earth)
-
-      if (intersects.length > 0 && !isHoveringRef.current) {
-        mount.style.cursor = 'pointer'
-        isHoveringRef.current = true
-      } else if (intersects.length === 0 && isHoveringRef.current) {
-        mount.style.cursor = 'default'
-        isHoveringRef.current = false
-      }
+      updateLightFromXY(x, y)
     }
 
-    const handleTouchMove = (event) => {
-      if (!event.touches.length) return
-      const touch = event.touches[0]
+    const handleTouchMove = (e) => {
+      if (!e.touches || e.touches.length === 0) return
+      const touch = e.touches[0]
       const rect = mount.getBoundingClientRect()
       const x = ((touch.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1
-      updateLightFromPointer(x, y)
+      updateLightFromXY(x, y)
+
+      if (lastTouchX.current !== null) {
+        const dx = touch.clientX - lastTouchX.current
+        spinVelocity.current = dx * 0.005
+      }
+      lastTouchX.current = touch.clientX
+    }
+
+    const handleTouchEnd = () => {
+      lastTouchX.current = null
     }
 
     const handleClick = () => {
@@ -139,13 +139,16 @@ export default function EarthCanvas() {
     }
 
     const animate = () => {
-      const target = isHoveringRef.current ? 1.5 : 1
-      spinMultiplier.current = THREE.MathUtils.lerp(spinMultiplier.current, target, 0.05)
+      // Easing the spin velocity
+      spinVelocity.current *= 0.95
+      spin.current += spinVelocity.current
 
-      earth.rotation.y += 0.002 * spinMultiplier.current
-      clouds.rotation.y += 0.003 * spinMultiplier.current
+      earth.rotation.y = spin.current
+      clouds.rotation.y = spin.current * 1.05
 
-      spotLight.position.lerp(targetLightPos, 0.05)
+      // Light easing
+      spotLight.position.lerp(lightTarget.current, 0.05)
+
       composer.render()
       requestAnimationFrame(animate)
     }
@@ -153,15 +156,17 @@ export default function EarthCanvas() {
 
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handleTouchEnd)
     window.addEventListener('resize', handleResize)
     window.addEventListener('click', handleClick)
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('click', handleClick)
-      if (renderer?.domElement && mount.contains(renderer.domElement)) {
+      if (renderer && mount.contains(renderer.domElement)) {
         mount.removeChild(renderer.domElement)
       }
       textures.forEach(t => t.dispose?.())
