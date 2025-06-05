@@ -9,16 +9,17 @@
 /* Masonry layout */
 .masonry {
   display: flex;
-  margin-left: -1rem;
-  width: auto;
+  flex-wrap: wrap;
+  gap: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .column {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  background-clip: padding-box;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 /* Each image or video item */
@@ -41,19 +42,6 @@
   display: block;
   object-fit: cover;
   border-radius: 6px;
-}
-
-.caption {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 12px;
-  color: #555;
-  margin-top: 6px;
-  word-break: break-word;
-  text-align: left;
-}
-
-.item img,
-.item video {
   transition: transform 1s ease;
   will-change: transform;
 }
@@ -78,12 +66,19 @@
   color: #555;
   margin-top: 6px;
   text-align: left;
+  word-break: break-word;
 }
 
+/* Responsive mobile fix */
 @media (max-width: 768px) {
   .container {
-    padding-left: .5rem;
-    padding-right: .5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
     padding-top: 2rem;
+  }
+
+  .masonry {
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }
