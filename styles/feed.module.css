@@ -79,3 +79,10 @@
   margin-top: 6px;
   text-align: left;
 }
+
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 2rem;
+  }
