@@ -56,7 +56,7 @@ body.reloading .nav img {
   position: absolute;
   top: 80px;
   width: 100%;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 1);
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
