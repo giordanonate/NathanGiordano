@@ -153,7 +153,7 @@ export default function EarthCanvas() {
       const baseSpin = 0.001
       spinVelocity.current *= 0.95
       spin.current += spinVelocity.current + baseSpin
-      cloudSpin.current += (spinVelocity.current + baseSpin) * 1.2
+      cloudSpin.current += (spinVelocity.current + baseSpin) * 1.3
 
       earth.rotation.y = spin.current
       clouds.rotation.y = cloudSpin.current
