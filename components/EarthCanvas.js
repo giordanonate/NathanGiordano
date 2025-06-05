@@ -123,7 +123,10 @@ export default function EarthCanvas() {
       lastTouchX.current = null
     }
 
-    const handleClick = () => {
+    const handleClick = (event) => {
+      const rect = mount.getBoundingClientRect()
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(mouse, camera)
       const intersects = raycaster.intersectObject(earth)
       if (intersects.length > 0) {
@@ -139,14 +142,14 @@ export default function EarthCanvas() {
     }
 
     const animate = () => {
-      // Easing the spin velocity
+      // Add baseline steady spin
+      const baseSpin = 0.0005
       spinVelocity.current *= 0.95
-      spin.current += spinVelocity.current
+      spin.current += spinVelocity.current + baseSpin
 
       earth.rotation.y = spin.current
       clouds.rotation.y = spin.current * 1.05
 
-      // Light easing
       spotLight.position.lerp(lightTarget.current, 0.05)
 
       composer.render()
