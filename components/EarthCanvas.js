@@ -10,6 +10,7 @@ export default function EarthCanvas() {
   const spinVelocity = useRef(0)
   const lastTouchX = useRef(null)
   const spin = useRef(0)
+  const cloudSpin = useRef(0)
   const lightTarget = useRef(new THREE.Vector3(0, 0, 5))
   const rendererRef = useRef(null)
 
@@ -102,6 +103,13 @@ export default function EarthCanvas() {
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       updateLightFromXY(x, y)
+
+      // Hover detection
+      mouse.x = x
+      mouse.y = y
+      raycaster.setFromCamera(mouse, camera)
+      const intersects = raycaster.intersectObject(earth)
+      mount.style.cursor = intersects.length > 0 ? 'pointer' : 'default'
     }
 
     const handleTouchMove = (e) => {
@@ -142,14 +150,13 @@ export default function EarthCanvas() {
     }
 
     const animate = () => {
-      // Add baseline steady spin
       const baseSpin = 0.001
       spinVelocity.current *= 0.95
       spin.current += spinVelocity.current + baseSpin
-      cloudSpin.current += (spinVelocity.current + baseSpin) * 1.05
+      cloudSpin.current += (spinVelocity.current + baseSpin) * 1.2
 
-      earth.rotation.y = spin.current 
-      clouds.rotation.y = spin.current
+      earth.rotation.y = spin.current
+      clouds.rotation.y = cloudSpin.current
 
       spotLight.position.lerp(lightTarget.current, 0.05)
 
