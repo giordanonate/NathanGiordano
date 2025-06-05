@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import styles from './navbar.module.css'
 
@@ -5,55 +6,83 @@ let isTransitioning = false
 
 export default function Navbar() {
   const router = useRouter()
+  const [isMobile, setIsMobile] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleNav = (target) => {
+    setIsOpen(false)
     if (isTransitioning) return
 
     isTransitioning = true
     setTimeout(() => {
       isTransitioning = false
-    }, 2400) // duration of full transition cycle (fade out + hold + fade in)
+    }, 2400)
 
-    if (router.pathname === target) {
-      const fakeRoute = `${target}?refresh=${Date.now()}`
-      window.dispatchEvent(new CustomEvent('start-transition', { detail: fakeRoute }))
-    } else {
-      window.dispatchEvent(new CustomEvent('start-transition', { detail: target }))
-    }
+    const destination =
+      router.pathname === target
+        ? `${target}?refresh=${Date.now()}`
+        : target
+
+    window.dispatchEvent(
+      new CustomEvent('start-transition', { detail: destination })
+    )
   }
+
+  const navItems = [
+    { src: '/assets/nav/home-1.png', alt: 'Home', target: '/home' },
+    { src: '/assets/nav/sketch-1.png', alt: 'Sketchbook', target: '/sketchbook' },
+    { src: '/assets/nav/being-1.png', alt: 'BEING', target: '/being' },
+    { src: '/assets/nav/superbeing-1.png', alt: 'SUPERBEING', target: '/superbeing' },
+  ]
 
   return (
     <nav className={styles.nav}>
-      <img
-        src="/assets/nav/home-1.png"
-        alt="Home"
-        onClick={(e) => { e.preventDefault(); handleNav('/home'); }}
-      />
-      <img
-        src="/assets/nav/sketch-1.png"
-        alt="Sketchbook"
-        onClick={(e) => { e.preventDefault(); handleNav('/sketchbook'); }}
-      />
-      <img
-        src="/assets/nav/being-1.png"
-        alt="BEING"
-        onClick={(e) => { e.preventDefault(); handleNav('/being'); }}
-      />
-      <img
-        src="/assets/nav/superbeing-1.png"
-        alt="SUPERBEING"
-        onClick={(e) => { e.preventDefault(); handleNav('/superbeing'); }}
-      />
-      <a
-        href="https://lightwork.art"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <img
-          src="/assets/nav/lightwork-1.png"
-          alt="Light Work"
-        />
-      </a>
+      {isMobile ? (
+        <>
+          <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
+            ☰
+          </button>
+          {isOpen && (
+            <div className={styles.dropdown}>
+              {navItems.map(({ src, alt, target }) => (
+                <img
+                  key={alt}
+                  src={src}
+                  alt={alt}
+                  onClick={(e) => { e.preventDefault(); handleNav(target) }}
+                />
+              ))}
+              <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
+                <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
+              </a>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {navItems.map(({ src, alt, target }) => (
+            <img
+              key={alt}
+              src={src}
+              alt={alt}
+              onClick={(e) => { e.preventDefault(); handleNav(target) }}
+            />
+          ))}
+          <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
+            <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
+          </a>
+        </>
+      )}
     </nav>
   )
 }
+

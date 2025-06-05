@@ -143,12 +143,13 @@ export default function EarthCanvas() {
 
     const animate = () => {
       // Add baseline steady spin
-      const baseSpin = 0.0005
+      const baseSpin = 0.001
       spinVelocity.current *= 0.95
       spin.current += spinVelocity.current + baseSpin
+      cloudSpin.current += (spinVelocity.current + baseSpin) * 1.05
 
-      earth.rotation.y = spin.current
-      clouds.rotation.y = spin.current * 1.05
+      earth.rotation.y = spin.current 
+      clouds.rotation.y = spin.current
 
       spotLight.position.lerp(lightTarget.current, 0.05)
 
