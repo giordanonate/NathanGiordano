@@ -1,3 +1,9 @@
+.navWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* Main nav container */
 .nav {
   position: fixed;
   top: 0;
@@ -9,12 +15,6 @@
   z-index: 100;
   display: flex;
   justify-content: center;
-  align-items: center;
-}
-
-.navInner {
-  display: flex;
-  gap: 2rem;
   align-items: center;
 }
 
@@ -36,23 +36,29 @@
   opacity: 0.7;
 }
 
-/* Disable clicks during fade */
+/* Disable clicks during transition */
 body.reloading .nav img {
   pointer-events: none;
   opacity: 0.5;
 }
 
-/* ☰ Menu Button for Mobile */
+/* Mobile menu button */
 .menuButton {
-  font-size: 2rem;
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 2.5rem;
   background: none;
   border: none;
-  cursor: pointer;
   color: black;
-  padding: 1rem 1rem;
+  z-index: 101;
+  cursor: pointer;
   user-select: none;
+  padding: 0.5rem 1rem;
 }
 
+/* Dropdown menu (mobile) */
 .dropdown {
   position: absolute;
   top: 80px;
@@ -78,26 +84,10 @@ body.reloading .nav img {
   transform: scale(1.05);
 }
 
-
+/* Responsive mobile-only tweaks */
 @media (max-width: 768px) {
   .nav {
     justify-content: center;
+    padding: 0;
   }
-}
-
-
-/* Menu button styling for mobile */
-.menuButton {
-  position: fixed; /* instead of absolute */
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 2.5rem;
-  background: none;
-  border: none;
-  color: black;
-  z-index: 101;
-  cursor: pointer;
-  user-select: none;
-  padding: 0.5rem 1rem;
 }

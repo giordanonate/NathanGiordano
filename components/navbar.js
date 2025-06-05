@@ -45,13 +45,15 @@ export default function Navbar() {
   ]
 
   return (
-    <nav className={styles.nav}>
-      {isMobile ? (
-        <>
-          <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
-            ☰
-          </button>
-          {isOpen && (
+    <div className={styles.navWrapper}>
+      {isMobile && (
+        <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
+          ☰
+        </button>
+      )}
+      <nav className={styles.nav}>
+        {isMobile ? (
+          isOpen && (
             <div className={styles.dropdown}>
               {navItems.map(({ src, alt, target }) => (
                 <img
@@ -65,24 +67,23 @@ export default function Navbar() {
                 <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
               </a>
             </div>
-          )}
-        </>
-      ) : (
-        <>
-          {navItems.map(({ src, alt, target }) => (
-            <img
-              key={alt}
-              src={src}
-              alt={alt}
-              onClick={(e) => { e.preventDefault(); handleNav(target) }}
-            />
-          ))}
-          <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
-            <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
-          </a>
-        </>
-      )}
-    </nav>
+          )
+        ) : (
+          <>
+            {navItems.map(({ src, alt, target }) => (
+              <img
+                key={alt}
+                src={src}
+                alt={alt}
+                onClick={(e) => { e.preventDefault(); handleNav(target) }}
+              />
+            ))}
+            <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
+              <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
+            </a>
+          </>
+        )}
+      </nav>
+    </div>
   )
 }
-
