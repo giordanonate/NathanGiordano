@@ -88,7 +88,7 @@ body.reloading .nav img {
 
 /* Menu button styling for mobile */
 .menuButton {
-  position: absolute;
+  position: fixed; /* instead of absolute */
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
@@ -99,5 +99,5 @@ body.reloading .nav img {
   z-index: 101;
   cursor: pointer;
   user-select: none;
-  padding: 1rem 1rem;
+  padding: 0.5rem 1rem;
 }
