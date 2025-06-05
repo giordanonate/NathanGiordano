@@ -47,10 +47,16 @@ export default function Navbar() {
   return (
     <div className={styles.navWrapper}>
       {isMobile && (
-        <button className={styles.menuButton} onClick={() => setIsOpen(!isOpen)}>
-          ☰
-        </button>
+        <div className={styles.menuBar}>
+          <button
+            className={styles.menuButton}
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            ☰
+          </button>
+        </div>
       )}
+
       <nav className={styles.nav}>
         {isMobile ? (
           isOpen && (
@@ -60,10 +66,17 @@ export default function Navbar() {
                   key={alt}
                   src={src}
                   alt={alt}
-                  onClick={(e) => { e.preventDefault(); handleNav(target) }}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleNav(target)
+                  }}
                 />
               ))}
-              <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://lightwork.art"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
               </a>
             </div>
@@ -75,10 +88,17 @@ export default function Navbar() {
                 key={alt}
                 src={src}
                 alt={alt}
-                onClick={(e) => { e.preventDefault(); handleNav(target) }}
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleNav(target)
+                }}
               />
             ))}
-            <a href="https://lightwork.art" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://lightwork.art"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img src="/assets/nav/lightwork-1.png" alt="Light Work" />
             </a>
           </>
