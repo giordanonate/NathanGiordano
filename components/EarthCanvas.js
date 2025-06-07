@@ -39,7 +39,7 @@ export default function EarthCanvas() {
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(
       new BokehPass(scene, camera, {
-        focus: 2.7,
+        focus: 2.6,
         aperture: 0.025,
         maxblur: 0.01,
         width: mount.clientWidth,
@@ -47,7 +47,7 @@ export default function EarthCanvas() {
       })
     )
 
-    const spotLight = new THREE.SpotLight(0xffddaa, 50, 0, Math.PI / 1, 0.1)
+    const spotLight = new THREE.SpotLight(0xffddaa, 60, 0, Math.PI / 1, 0.1)
     spotLight.position.set(0, 0, 50)
     spotLight.target.position.set(0, 0, 0)
     scene.add(spotLight)
@@ -69,11 +69,11 @@ export default function EarthCanvas() {
       specularMap: specMap,
       emissiveMap: emissiveMap,
       emissive: new THREE.Color(0xffcc88),
-      emissiveIntensity: 1,
+      emissiveIntensity: .7,
       shininess: 5,
       specular: new THREE.Color(0xffffff)
     })
-    const earth = new THREE.Mesh(new THREE.SphereGeometry(0.3, 64, 64), earthMaterial)
+    const earth = new THREE.Mesh(new THREE.SphereGeometry(0.44, 64, 64), earthMaterial)
     scene.add(earth)
 
     const cloudMaterial = new THREE.MeshPhongMaterial({
@@ -87,7 +87,7 @@ export default function EarthCanvas() {
       emissive: new THREE.Color(0xffffff),
       emissiveIntensity: 0.3
     })
-    const clouds = new THREE.Mesh(new THREE.SphereGeometry(0.305, 64, 64), cloudMaterial)
+    const clouds = new THREE.Mesh(new THREE.SphereGeometry(0.444, 64, 64), cloudMaterial)
     scene.add(clouds)
 
     const raycaster = new THREE.Raycaster()
@@ -104,7 +104,6 @@ export default function EarthCanvas() {
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       updateLightFromXY(x, y)
 
-      // Hover detection
       mouse.x = x
       mouse.y = y
       raycaster.setFromCamera(mouse, camera)
@@ -190,9 +189,7 @@ export default function EarthCanvas() {
       style={{
         width: '100%',
         height: '100%',
-        position: 'absolute',
-        top: 0,
-        left: 0,
+        position: 'relative',
         overflow: 'hidden'
       }}
     />

@@ -5,13 +5,13 @@ import fs from 'fs'
 import Masonry from 'react-masonry-css'
 import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
-import HomeFadeInOverlay from '../components/HomeFadeInOverlay'
+import EarthCanvas from '../components/EarthCanvas'
 
 export async function getStaticProps() {
   const dir = path.join(process.cwd(), 'public/nathan-giordano')
   const files = fs.readdirSync(dir)
   const media = files
-    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
     .map(file => `/nathan-giordano/${file}`)
 
   return { props: { media } }
@@ -86,8 +86,17 @@ export default function Home({ media }) {
         />
       </Head>
       <Navbar />
-      <HomeFadeInOverlay />
-      <div style={{ height: '80px' }}></div>
+
+      <section className={styles.earthSection}>
+        <EarthCanvas />
+        <div className={styles.earthOverlay}>
+          <h1>This is a catalog of work—ranging from 2D, 3D, animation, painting, drawing, and digital-physical hybrids. You get it. I create in multi-media.</h1>
+          <p>The collection reshuffles itself every time you load the page. That interplay—the juxtaposition of elements, the unexpected pairings—is part of what keeps it interesting.</p>
+        </div>
+      </section>
+
+      <div style={{ height: '30px' }}></div>
+
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}
@@ -106,7 +115,7 @@ export default function Home({ media }) {
                   {src.match(/\.(mp4|mov)$/i) ? (
                     <video src={src} autoPlay muted loop playsInline preload="none" />
                   ) : (
-                    <img src={src} alt={`media ${idx}`} loading="lazy" />
+                    <img src={src.replace(/\.cr2$/i, '.jpg')} alt={`media ${idx}`} loading="lazy" />
                   )}
                   <p className={styles.caption}>{fileName}</p>
                 </div>
@@ -118,3 +127,4 @@ export default function Home({ media }) {
     </>
   )
 }
+

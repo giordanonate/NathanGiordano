@@ -87,7 +87,7 @@ export default function Superbeing({ media }) {
       <main className={styles.container}>
         <Masonry
           breakpointCols={breakpoints}
-          className={styles.masonry}
+          className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
           columnClassName={styles.column}
         >
           {visibleMedia.map((src, idx) => {
