@@ -80,7 +80,7 @@ export default function Home({ media }) {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
       const isMobile = window.innerWidth <= 768;
-      const threshold = isMobile ? 1000 : 600;
+      const threshold = isMobile ? 33333 : 22222;
 
       if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
