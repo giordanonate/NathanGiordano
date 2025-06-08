@@ -77,7 +77,7 @@ export default function Home({ media }) {
   useEffect(() => {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
-      if (window.scrollY > 5000) {
+      if (window.scrollY > 22222) {
         overlay?.classList.add(styles.visible)
       } else {
         overlay?.classList.remove(styles.visible)
