@@ -27,7 +27,9 @@ export default function Home({ media }) {
   }, [])
 
   useEffect(() => {
-    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, 100)
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+    const itemLimit = isMobile ? 50 : 100;
+    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit);
     setShuffled(limited)
   }, [media])
 
@@ -77,7 +79,10 @@ export default function Home({ media }) {
   useEffect(() => {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
-      if (window.scrollY > 22222) {
+      const isMobile = window.innerWidth <= 768;
+      const threshold = isMobile ? 1000 : 600;
+
+      if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
       } else {
         overlay?.classList.remove(styles.visible)
