@@ -74,6 +74,19 @@ export default function Home({ media }) {
     }, 50)
   }, [shuffled])
 
+  useEffect(() => {
+    const overlay = document.getElementById('fadeOverlay')
+    const handleScroll = () => {
+      if (window.scrollY > 5000) {
+        overlay?.classList.add(styles.visible)
+      } else {
+        overlay?.classList.remove(styles.visible)
+      }
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
   const breakpoints = { default: 3, 768: 2, 480: 1 }
   const visibleMedia = shuffled.slice(0, visibleCount)
 
@@ -89,12 +102,7 @@ export default function Home({ media }) {
 
       <Navbar />
 
-      <section style={{     
-      width: '100%',
-      position: 'relative',
-      zIndex: 1 
-      }}
-      >
+      <section style={{ width: '100%', position: 'relative', zIndex: 1 }}>
         <EarthCanvas />
       </section>
 
@@ -142,7 +150,20 @@ export default function Home({ media }) {
           })}
         </Masonry>
       </main>
+
+      <div id="fadeOverlay" className={`${styles.fadeOverlay}`}>
+        <img
+          src="/assets/fade-overlay.png"
+          alt="Fade Overlay"
+          className={styles.fadeImage}
+        />
+        <button
+          className={styles.rerollButton}
+          onClick={() => window.location.reload()}
+        >
+          Reroll
+        </button>
+      </div>
     </>
   )
 }
-
