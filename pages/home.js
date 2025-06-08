@@ -27,7 +27,8 @@ export default function Home({ media }) {
   }, [])
 
   useEffect(() => {
-    setShuffled([...media].sort(() => 0.5 - Math.random()))
+    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, 100)
+    setShuffled(limited)
   }, [media])
 
   useEffect(() => {
@@ -85,19 +86,32 @@ export default function Home({ media }) {
           rel="stylesheet"
         />
       </Head>
+
       <Navbar />
 
-      <section className={styles.earthSection}>
+      <section style={{     
+      width: '100%',
+      position: 'relative',
+      zIndex: 1 
+      }}
+      >
         <EarthCanvas />
-        <div className={styles.earthOverlay}>
-          <h1>This is a catalog of work—ranging from 2D, 3D, animation, painting, drawing, and digital-physical hybrids. You get it. I create in multi-media.</h1>
-          <p>The collection reshuffles itself every time you load the page. That interplay—the juxtaposition of elements, the unexpected pairings—is part of what keeps it interesting.</p>
-        </div>
       </section>
 
-      <div style={{ height: '30px' }}></div>
+      <section className={styles.copyBlock}>
+        <h1>
+          This is a catalog of work ranging from 2D, 3D, photography, animation, painting,
+          drawing, and digital-physical hybrids. I create in multi-media.
+        </h1>
+        <p>
+          The collection reshuffles itself every time you load the page. That
+          interplay—the juxtaposition of elements, the unexpected pairings—is
+          part of what keeps it interesting. The page only loads 100 items at 
+          a time, although the database has more than that.
+        </p>
+      </section>
 
-      <main className={styles.container}>
+      <main className={`${styles.grid} ${styles.container}`}>
         <Masonry
           breakpointCols={breakpoints}
           className={styles.masonry}
@@ -115,7 +129,11 @@ export default function Home({ media }) {
                   {src.match(/\.(mp4|mov)$/i) ? (
                     <video src={src} autoPlay muted loop playsInline preload="none" />
                   ) : (
-                    <img src={src.replace(/\.cr2$/i, '.jpg')} alt={`media ${idx}`} loading="lazy" />
+                    <img
+                      src={src.replace(/\.cr2$/i, '.jpg')}
+                      alt={`media ${idx}`}
+                      loading="lazy"
+                    />
                   )}
                   <p className={styles.caption}>{fileName}</p>
                 </div>

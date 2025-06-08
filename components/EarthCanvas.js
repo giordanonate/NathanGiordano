@@ -183,15 +183,15 @@ export default function EarthCanvas() {
     }
   }, [])
 
-  return (
-    <div
-      ref={mountRef}
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        overflow: 'hidden'
-      }}
-    />
-  )
-}
+return (
+<div
+  ref={mountRef}
+  style={{
+    width: '100%',
+    height: '90vh',
+    position: 'relative', // changed from absolute
+    zIndex: 1,
+    transform: 'translateY(-3rem)'
+  }}
+/>
+)}

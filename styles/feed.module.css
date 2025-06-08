@@ -1,12 +1,38 @@
-/* Container for whole page content */
-.container {
-  padding-top: 0rem; 
-  padding-left: 6rem;
-  padding-right: 6rem;
-  box-sizing: border-box;
+/* ========== COPY SECTION ========== */
+
+.copyBlock {
+  padding: 4rem 6rem;
+  transform: translateY(-17rem);
+  max-width: 850px;
+  font-family: 'Roboto Mono', monospace;
+  color: black;
+  position: relative;
+  z-index: 2;
+  overflow: visible;
 }
 
-/* Masonry layout */
+.copyBlock h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.copyBlock p {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.7;
+}
+
+/* ========== MASONRY GRID ========== */
+
+.grid {
+  margin-top: -20rem;
+}
+
+.container {
+  padding: 0 6rem;
+}
+
 .masonry {
   display: flex;
   flex-wrap: wrap;
@@ -22,7 +48,6 @@
   min-width: 0;
 }
 
-/* Each image or video item */
 .item {
   margin-bottom: 2rem;
   opacity: 0;
@@ -46,18 +71,21 @@
   will-change: transform;
 }
 
-.item:hover img,
-.item:hover video {
-  transform: scale(1.01);
-}
-
 .mediaWrapper {
   transition: transform 0.5s ease;
   will-change: transform;
 }
 
-.item:hover .mediaWrapper {
-  transform: scale(1.03);
+/* Desktop hover effect only */
+@media (hover: hover) and (pointer: fine) {
+  .item:hover img,
+  .item:hover video {
+    transform: scale(1.01);
+  }
+
+  .item:hover .mediaWrapper {
+    transform: scale(1.03);
+  }
 }
 
 .caption {
@@ -69,12 +97,15 @@
   word-break: break-word;
 }
 
-/* Responsive mobile fix */
+/* ========== RESPONSIVE ========== */
+
 @media (max-width: 768px) {
+  .copyBlock {
+    padding: 3rem 1.5rem;
+  }
+
   .container {
-    padding-left: 1rem;
-    padding-right: 1rem;
-    padding-top: 2rem;
+    padding: 0 1rem;
   }
 
   .masonry {
@@ -82,40 +113,4 @@
     gap: 1.5rem;
   }
 }
-
-.masonryWithTopPadding {
-  padding-top: 4rem;
-}
-
-.earthSection {
-  position: relative;
-  height: 90vh;
-  overflow: hidden;
-}
-
-.earthOverlay {
-  position: absolute;
-  top: 85%;
-  left: 50%;
-  transform: translate(-50%, -30%);
-  z-index: 2;
-  max-width: 1500px;
-  text-align: left;
-  padding: 0 1.5rem;
-  font-family: 'Roboto Mono', monospace;
-  color: black;
-}
-
-.earthOverlay h1 {
-  font-size: 3 rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.earthOverlay p {
-  font-size: 1rem;
-  line-height: 1.6;
-  opacity: 0.7;
-}
-
 
