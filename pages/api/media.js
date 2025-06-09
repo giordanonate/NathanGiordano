@@ -1,27 +1,25 @@
-import fs from 'fs'
-import path from 'path'
+export default async function handler(req, res) {
+  const API_KEY = process.env.GOOGLE_DRIVE_API_KEY
+  const FOLDER_ID = '1YD-G6_3ctUFeyXAy2RYnu4KZZiAo4rur'
 
-export default function handler(req, res) {
+  const url = `https://www.googleapis.com/drive/v3/files?q='${FOLDER_ID}'+in+parents&key=${API_KEY}&fields=files(id,name,mimeType)&pageSize=100`
+
   try {
-    const mediaDir = path.join(process.cwd(), 'public/nathan-giordano')
+    const response = await fetch(url)
+    const data = await response.json()
 
-    // Read only filenames, don't preload anything
-    const allFiles = fs.readdirSync(mediaDir).filter(file =>
-      file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i)
-    )
-
-    // Shuffle & take just 100
-    const selected = allFiles
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 100)
+    const media = data.files
+      .filter(file =>
+        file.mimeType.startsWith('image/') || file.mimeType.startsWith('video/')
+      )
       .map(file => ({
-        name: file,
-        url: `/nathan-giordano/${file}`
+        name: file.name,
+        url: `https://drive.google.com/uc?export=view&id=${file.id}`
       }))
 
-    res.status(200).json(selected)
+    res.status(200).json(media)
   } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Failed to read media directory' })
+    console.error('Drive API error:', err)
+    res.status(500).json({ error: 'Failed to fetch media from Google Drive' })
   }
 }
