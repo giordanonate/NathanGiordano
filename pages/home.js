@@ -1,26 +1,21 @@
 import { useEffect, useRef, useState } from 'react'
 import Head from 'next/head'
-import path from 'path'
-import fs from 'fs'
 import Masonry from 'react-masonry-css'
 import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
 import EarthCanvas from '../components/EarthCanvas'
 
-export async function getStaticProps() {
-  const dir = path.join(process.cwd(), 'public/nathan-giordano')
-  const files = fs.readdirSync(dir)
-  const media = files
-    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
-    .map(file => `/nathan-giordano/${file}`)
-
-  return { props: { media } }
-}
-
-export default function Home({ media }) {
+export default function Home() {
+  const [media, setMedia] = useState([])
   const [visibleCount, setVisibleCount] = useState(12)
   const [shuffled, setShuffled] = useState([])
   const itemRefs = useRef([])
+
+  useEffect(() => {
+    fetch('/api/media')
+      .then(res => res.json())
+      .then(setMedia)
+  }, [])
 
   useEffect(() => {
     document.body.classList.remove('reloading')
@@ -120,7 +115,7 @@ export default function Home({ media }) {
           The collection reshuffles itself every time you load the page. That
           interplay—the juxtaposition of elements, the unexpected pairings—is
           part of what keeps it interesting. The page only loads 100 items at 
-          a time, although the database has more than that.
+          a time (50 on mobile), although the database has more than that.
         </p>
       </section>
 
