@@ -125,20 +125,20 @@ export default function Home() {
           className={styles.masonry}
           columnClassName={styles.column}
         >
-          {visibleMedia.map((src, idx) => {
-            const fileName = src.split('/').pop().split('.').slice(0, -1).join('.')
+          {visibleMedia.map(({ name, url }, idx) => {
+            const fileName = name.split('.').slice(0, -1).join('.')
             return (
               <div
-                key={src}
+                key={url}
                 ref={el => (itemRefs.current[idx] = el)}
                 className={styles.item}
               >
                 <div className={styles.mediaWrapper}>
-                  {src.match(/\.(mp4|mov)$/i) ? (
-                    <video src={src} autoPlay muted loop playsInline preload="none" />
+                  {url.match(/\.(mp4|mov)$/i) ? (
+                    <video src={url} autoPlay muted loop playsInline preload="none" />
                   ) : (
                     <img
-                      src={src.replace(/\.cr2$/i, '.jpg')}
+                      src={url.replace(/\.cr2$/i, '.jpg')}
                       alt={`media ${idx}`}
                       loading="lazy"
                     />
