@@ -8,11 +8,14 @@ import Navbar from '../components/navbar'
 import EarthCanvas from '../components/EarthCanvas'
 
 export async function getStaticProps() {
-  const dir = path.join(process.cwd(), 'public/nathan-giordano')
-  const files = fs.readdirSync(dir)
-  const media = files
-    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
-    .map(file => `/nathan-giordano/${file}`)
+  const res = await fetch('https://delicate-credit-08df.giordanonate.workers.dev/')
+  let media = await res.json()
+
+  // Limit total returned items
+  media = media
+    .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i)) // just in case
+    .sort(() => 0.5 - Math.random()) // shuffle
+    .slice(0, 100) // limit
 
   return { props: { media } }
 }
