@@ -2,17 +2,26 @@ import fs from 'fs'
 import path from 'path'
 
 export default function handler(req, res) {
-  const mediaDir = path.join(process.cwd(), 'public/nathan-giordano')
-  const allFiles = fs.readdirSync(mediaDir)
-    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
+  try {
+    const mediaDir = path.join(process.cwd(), 'public/nathan-giordano')
 
-  // Shuffle and limit to 100
-  const shuffled = allFiles.sort(() => 0.5 - Math.random()).slice(0, 100)
+    // Read only filenames, don't preload anything
+    const allFiles = fs.readdirSync(mediaDir).filter(file =>
+      file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i)
+    )
 
-  const media = shuffled.map(file => ({
-    name: file,
-    url: `/nathan-giordano/${file}`
-  }))
+    // Shuffle & take just 100
+    const selected = allFiles
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 100)
+      .map(file => ({
+        name: file,
+        url: `/nathan-giordano/${file}`
+      }))
 
-  res.status(200).json(media)
+    res.status(200).json(selected)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to read media directory' })
+  }
 }
