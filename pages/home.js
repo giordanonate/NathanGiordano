@@ -1,21 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import Head from 'next/head'
+import path from 'path'
+import fs from 'fs'
 import Masonry from 'react-masonry-css'
 import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
 import EarthCanvas from '../components/EarthCanvas'
 
-export default function Home() {
-  const [media, setMedia] = useState([])
+export async function getStaticProps() {
+  const dir = path.join(process.cwd(), 'public/nathan-giordano')
+  const files = fs.readdirSync(dir)
+  const media = files
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
+    .map(file => `/nathan-giordano/${file}`)
+
+  return { props: { media } }
+}
+
+export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
   const [shuffled, setShuffled] = useState([])
   const itemRefs = useRef([])
-
-  useEffect(() => {
-    fetch('/api/media')
-      .then(res => res.json())
-      .then(setMedia)
-  }, [])
 
   useEffect(() => {
     document.body.classList.remove('reloading')
@@ -75,7 +80,7 @@ export default function Home() {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
       const isMobile = window.innerWidth <= 768;
-      const threshold = isMobile ? 28888 : 22222;
+      const threshold = isMobile ? 24444 : 22222;
 
       if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
@@ -115,7 +120,7 @@ export default function Home() {
           The collection reshuffles itself every time you load the page. That
           interplay—the juxtaposition of elements, the unexpected pairings—is
           part of what keeps it interesting. The page only loads 100 items at 
-          a time (50 on mobile), although the database has more than that.
+          a time, although the database has more than that.
         </p>
       </section>
 
@@ -125,20 +130,20 @@ export default function Home() {
           className={styles.masonry}
           columnClassName={styles.column}
         >
-          {visibleMedia.map(({ name, url }, idx) => {
-            const fileName = name.split('.').slice(0, -1).join('.')
+          {visibleMedia.map((src, idx) => {
+            const fileName = src.split('/').pop().split('.').slice(0, -1).join('.')
             return (
               <div
-                key={url}
+                key={src}
                 ref={el => (itemRefs.current[idx] = el)}
                 className={styles.item}
               >
                 <div className={styles.mediaWrapper}>
-                  {url.match(/\.(mp4|mov)$/i) ? (
-                    <video src={url} autoPlay muted loop playsInline preload="none" />
+                  {src.match(/\.(mp4|mov)$/i) ? (
+                    <video src={src} autoPlay muted loop playsInline preload="none" />
                   ) : (
                     <img
-                      src={url.replace(/\.cr2$/i, '.jpg')}
+                      src={src.replace(/\.cr2$/i, '.jpg')}
                       alt={`media ${idx}`}
                       loading="lazy"
                     />
