@@ -8,6 +8,11 @@ export default async function handler(req, res) {
     const response = await fetch(url)
     const data = await response.json()
 
+    if (!response.ok) {
+      console.error("Google API Error:", data)
+      return res.status(500).json({ error: 'Google Drive API failed', details: data })
+    }
+
     const media = data.files
       .filter(file =>
         file.mimeType.startsWith('image/') || file.mimeType.startsWith('video/')
@@ -19,7 +24,7 @@ export default async function handler(req, res) {
 
     res.status(200).json(media)
   } catch (err) {
-    console.error('Drive API error:', err)
+    console.error("Server error:", err)
     res.status(500).json({ error: 'Failed to fetch media from Google Drive' })
   }
 }
