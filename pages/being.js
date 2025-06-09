@@ -84,7 +84,7 @@ export default function Being({ media }) {
       <Navbar />
       <div className={styles.pageFade}></div>
       <div style={{ height: '80px' }}></div>
-      <main className={styles.container}>
+      <main className={styles.container} style={{ marginTop: '4rem' }}>
         <Masonry
           breakpointCols={breakpoints}
           className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
