@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import Head from 'next/head'
-import path from 'path'
-import fs from 'fs'
 import Masonry from 'react-masonry-css'
 import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
@@ -11,11 +9,10 @@ export async function getStaticProps() {
   const res = await fetch('https://delicate-credit-08df.giordanonate.workers.dev/')
   let media = await res.json()
 
-  // Limit total returned items
   media = media
-    .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i)) // just in case
-    .sort(() => 0.5 - Math.random()) // shuffle
-    .slice(0, 100) // limit
+    .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 100)
 
   return { props: { media } }
 }
@@ -30,9 +27,9 @@ export default function Home({ media }) {
   }, [])
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    const itemLimit = isMobile ? 50 : 100;
-    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit);
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+    const itemLimit = isMobile ? 50 : 100
+    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit)
     setShuffled(limited)
   }, [media])
 
@@ -82,8 +79,8 @@ export default function Home({ media }) {
   useEffect(() => {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
-      const isMobile = window.innerWidth <= 768;
-      const threshold = isMobile ? 28888 : 22222;
+      const isMobile = window.innerWidth <= 768
+      const threshold = isMobile ? 28888 : 22222
 
       if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
