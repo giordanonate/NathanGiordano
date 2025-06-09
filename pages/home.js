@@ -10,13 +10,13 @@ export async function getStaticProps() {
   let media = await res.json()
 
   media = media
-    .map(url => encodeURI(url)) // <--- ✨ encode filenames with spaces
-    .filter(url => url.match(/\.(jpe?g|png|gif|webp|mp4|mov)$/i))
+    .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
     .sort(() => 0.5 - Math.random())
     .slice(0, 100)
 
   return { props: { media } }
 }
+
 
 export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
@@ -132,28 +132,27 @@ export default function Home({ media }) {
           columnClassName={styles.column}
         >
           {visibleMedia.map((src, idx) => {
-            const fileName = src.split('/').pop().split('.').slice(0, -1).join('.')
-            return (
-              <div
-                key={src}
-                ref={el => (itemRefs.current[idx] = el)}
-                className={styles.item}
-              >
-                <div className={styles.mediaWrapper}>
-                  {src.match(/\.(mp4|mov)$/i) ? (
-                    <video src={src} autoPlay muted loop playsInline preload="none" />
-                  ) : (
-                    <img
-                      src={src.replace(/\.cr2$/i, '.jpg')}
-                      alt={`media ${idx}`}
-                      loading="lazy"
-                    />
-                  )}
-                  <p className={styles.caption}>{fileName}</p>
-                </div>
-              </div>
-            )
-          })}
+  const fileName = decodeURIComponent(
+    src.split('/').pop().split('.').slice(0, -1).join('.')
+  )
+
+  return (
+    <div
+      key={src}
+      ref={el => (itemRefs.current[idx] = el)}
+      className={styles.item}
+    >
+      <div className={styles.mediaWrapper}>
+        {src.match(/\.(mp4|mov)$/i) ? (
+          <video src={src} autoPlay muted loop playsInline preload="none" />
+        ) : (
+          <img src={src} alt={`media ${idx}`} loading="lazy" />
+        )}
+        <p className={styles.caption}>{fileName}</p>
+      </div>
+    </div>
+  )
+})}
         </Masonry>
       </main>
 
