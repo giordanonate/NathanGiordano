@@ -10,7 +10,8 @@ export async function getStaticProps() {
   let media = await res.json()
 
   media = media
-    .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
+    .map(url => encodeURI(url)) // <--- ✨ encode filenames with spaces
+    .filter(url => url.match(/\.(jpe?g|png|gif|webp|mp4|mov)$/i))
     .sort(() => 0.5 - Math.random())
     .slice(0, 100)
 
