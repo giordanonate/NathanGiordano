@@ -3,9 +3,13 @@ import path from 'path'
 
 export default function handler(req, res) {
   const mediaDir = path.join(process.cwd(), 'public/nathan-giordano')
-  const files = fs.readdirSync(mediaDir)
+  const allFiles = fs.readdirSync(mediaDir)
+    .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov|cr2)$/i))
 
-  const media = files.map(file => ({
+  // Shuffle and limit to 100
+  const shuffled = allFiles.sort(() => 0.5 - Math.random()).slice(0, 100)
+
+  const media = shuffled.map(file => ({
     name: file,
     url: `/nathan-giordano/${file}`
   }))
