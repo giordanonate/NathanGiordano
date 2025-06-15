@@ -7,7 +7,7 @@ import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
 
 export async function getStaticProps() {
-  const dir = path.join(process.cwd(), 'public/super-being')
+  const dir = path.join(process.cwd(), 'private/super-being')
   const files = fs.readdirSync(dir)
   const media = files
     .filter(file => file.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
