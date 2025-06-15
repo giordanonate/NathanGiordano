@@ -23,12 +23,17 @@ export default function Superbeing({ media }) {
   const [input, setInput] = useState('')
   const itemRefs = useRef([])
 
-  // ✅ Check for cookie existence, not value
+  // ✅ Check for cookie existence
   useEffect(() => {
-    const hasAuthCookie = document.cookie
-      .split('; ')
-      .some(row => row.startsWith('sb-auth='))
-    setAuthorized(hasAuthCookie)
+    const checkCookie = () => {
+      const hasAuthCookie = document.cookie
+        .split('; ')
+        .some(row => row.startsWith('sb-auth='))
+      setAuthorized(hasAuthCookie)
+    }
+
+    checkCookie()
+    setTimeout(checkCookie, 500)
   }, [])
 
   // ✅ Handle password submit
@@ -38,13 +43,13 @@ export default function Superbeing({ media }) {
       body: JSON.stringify({ password: input }),
     })
     if (res.ok) {
-      window.location.reload()
+      // ✅ Full redirect to re-trigger middleware + cookie read
+      window.location.href = '/superbeing'
     } else {
       alert('Wrong password')
     }
   }
 
-  // ✅ Setup content if authorized
   useEffect(() => {
     if (!authorized) return
     document.body.classList.remove('reloading')
@@ -104,12 +109,10 @@ export default function Superbeing({ media }) {
         <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
       </Head>
 
-      {/* Navbar always visible */}
       <div style={{ position: 'relative', zIndex: 10000 }}>
         <Navbar />
       </div>
 
-      {/* Password overlay */}
       {!authorized && (
         <div style={{
           position: 'fixed',
@@ -167,11 +170,10 @@ export default function Superbeing({ media }) {
         </div>
       )}
 
-      {/* Grid only if authorized */}
       {authorized && (
         <>
           <div style={{ height: '80px' }}></div>
-          <main className={styles.container}>
+          <main className={styles.container} style={{ marginTop: '4rem' }}>
             <Masonry
               breakpointCols={breakpoints}
               className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
@@ -203,4 +205,3 @@ export default function Superbeing({ media }) {
     </>
   )
 }
-
