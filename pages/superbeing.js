@@ -189,10 +189,21 @@ export default function Superbeing({ media }) {
                   >
                     <div className={styles.mediaWrapper}>
                       {src.match(/\.(mp4|mov)$/i) ? (
-                        <video src={src} autoPlay muted loop playsInline preload="none" />
-                      ) : (
-                        <img src={src} alt={`SuperBEING ${idx}`} loading="lazy" />
-                      )}
+  <video
+    src={`/api/superbeing-image?file=${encodeURIComponent(src.split('/').pop())}`}
+    autoPlay
+    muted
+    loop
+    playsInline
+    preload="none"
+  />
+) : (
+  <img
+    src={`/api/superbeing-image?file=${encodeURIComponent(src.split('/').pop())}`}
+    alt={`SuperBEING ${idx}`}
+    loading="lazy"
+  />
+)}
                       <p className={styles.caption}>{fileName}</p>
                     </div>
                   </div>
