@@ -8,14 +8,18 @@ export default function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     const handleRouteChange = (url) => {
+      // Lock body only on root path
       if (url === '/') {
         document.body.classList.add('locked');
       } else {
         document.body.classList.remove('locked');
       }
+
+      // Scroll to top after route change completes
+      window.scrollTo(0, 0);
     };
 
-    // Handle on first load
+    // Handle initial load
     handleRouteChange(router.pathname);
 
     router.events.on('routeChangeComplete', handleRouteChange);
