@@ -115,7 +115,7 @@ export default function Home({ media }) {
       <section className={styles.copyBlock}>
         <h1>
           This is a catalog of work ranging from 2D, 3D, photography, animation, painting,
-          drawing, and digital-physical hybrids. I create in multi-media.
+          drawing, and digital-physical hybrids. I create in multi-media. This is the age of the generalist.
         </h1>
         <p>
           The collection reshuffles itself every time you load the page. That
