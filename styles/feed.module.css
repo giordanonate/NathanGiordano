@@ -1,14 +1,37 @@
 /* ========== COPY SECTION ========== */
 
-.copyBlock {
+.copySection {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 2rem;
   padding: 4rem 6rem;
   transform: translateY(-17rem);
-  max-width: 850px;
-  font-family: 'Roboto Mono', monospace;
-  color: black;
   position: relative;
   z-index: 2;
   overflow: visible;
+}
+
+.copyBlock {
+  max-width: 850px;
+  font-family: 'Roboto Mono', monospace;
+  color: black;
+}
+
+.socialIcons {
+  display: flex;
+  flex-direction: row;
+  gap: calc(1rem + 10px);
+  padding: 10px;
+}
+
+.socialIcons a {
+  color: black;
+  transition: color 0.2s ease;
+}
+
+.socialIcons a:hover {
+  color: #555;
 }
 
 .copyBlock h1 {
@@ -100,8 +123,15 @@
 /* ========== RESPONSIVE ========== */
 
 @media (max-width: 768px) {
-  .copyBlock {
+  .copySection {
+    flex-direction: column;
+    align-items: flex-start;
     padding: 3rem 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .socialIcons {
+    margin-bottom: 2rem;
   }
 
   .container {
