@@ -87,8 +87,8 @@ export default function Home({ media }) {
   useEffect(() => {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
-      const isMobile = window.innerWidth <= 768
-      const threshold = isMobile ? 15000 : 20000
+      const isSmallScreen = window.innerWidth <= 1525
+      const threshold = isSmallScreen ? 15000 : 20000
 
       if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
@@ -96,6 +96,8 @@ export default function Home({ media }) {
         overlay?.classList.remove(styles.visible)
       }
     }
+    // Check immediately on mount to clear stale overlay state
+    overlay?.classList.remove(styles.visible)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
