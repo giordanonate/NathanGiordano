@@ -31,9 +31,20 @@ export default function IndexPage({ media }) {
   const timerRef = useRef(null)
   const movementRef = useRef(0)
   const lastMouseRef = useRef({ x: 0, y: 0 })
+  const lastTouchRef = useRef({ x: 0, y: 0 })
+  const touchMovementRef = useRef(0)
   const busyRef = useRef(false)
+  const layerARef = useRef(null)
+  const layerBRef = useRef(null)
 
   const isVideo = (url) => /\.(mp4|mov)$/i.test(url)
+
+  const resetAnimation = (el, className) => {
+    if (!el) return
+    el.classList.remove(className)
+    void el.offsetWidth // force reflow
+    el.classList.add(className)
+  }
 
   const advance = useCallback(() => {
     if (busyRef.current) return
@@ -52,9 +63,11 @@ export default function IndexPage({ media }) {
 
       if (directionRef.current === 'out') {
         setSrcA(nextSrc)
+        resetAnimation(layerARef.current, 'kb-layer-a')
         directionRef.current = 'in'
       } else {
         setSrcB(nextSrc)
+        resetAnimation(layerBRef.current, 'kb-layer-b')
         directionRef.current = 'out'
       }
       setAnimating(false)
@@ -82,6 +95,41 @@ export default function IndexPage({ media }) {
 
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [advance])
+
+  // Touch movement triggers image changes on mobile
+  useEffect(() => {
+    const THRESHOLD = 80
+
+    const handleTouchStart = (e) => {
+      if (e.touches.length > 0) {
+        lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+        touchMovementRef.current = 0
+      }
+    }
+
+    const handleTouchMove = (e) => {
+      if (e.touches.length === 0) return
+      const touch = e.touches[0]
+      const dx = touch.clientX - lastTouchRef.current.x
+      const dy = touch.clientY - lastTouchRef.current.y
+      lastTouchRef.current = { x: touch.clientX, y: touch.clientY }
+
+      const dist = Math.sqrt(dx * dx + dy * dy)
+      touchMovementRef.current += dist
+
+      if (touchMovementRef.current >= THRESHOLD && !busyRef.current) {
+        touchMovementRef.current = 0
+        advance()
+      }
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+    }
   }, [advance])
 
   // Base timer for when mouse is idle
@@ -129,7 +177,7 @@ export default function IndexPage({ media }) {
     </Head>
     <div onClick={handleWrapperClick} style={wrapperStyle}>
       {/* Layer B — always on bottom */}
-      <div className="kb-layer-b" style={{ ...layerStyle, zIndex: 0 }}>
+      <div ref={layerBRef} className="kb-layer-b" style={{ ...layerStyle, zIndex: 0 }}>
         {srcB && (isVideo(srcB) ? (
           <video src={srcB} autoPlay muted loop playsInline style={mediaStyle} />
         ) : (
@@ -138,7 +186,7 @@ export default function IndexPage({ media }) {
       </div>
 
       {/* Layer A — always on top, fades in/out */}
-      <div className="kb-layer-a" style={{
+      <div ref={layerARef} className="kb-layer-a" style={{
         ...layerStyle,
         zIndex: 1,
         opacity: aVisible ? 1 : 0,
