@@ -50,7 +50,6 @@ export default function Home({ media }) {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY
       const docHeight = document.body.offsetHeight
-      if (docHeight >= 10000) return
       if (scrollBottom >= docHeight - 1000) {
         setVisibleCount(prev => Math.min(prev + 12, shuffled.length))
       }
@@ -89,7 +88,7 @@ export default function Home({ media }) {
     const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
       const isMobile = window.innerWidth <= 768
-      const threshold = isMobile ? 22222 : 22222
+      const threshold = isMobile ? 15000 : 20000
 
       if (window.scrollY > threshold) {
         overlay?.classList.add(styles.visible)
@@ -108,11 +107,6 @@ export default function Home({ media }) {
     <>
       <Head>
         <title>nathangiordano.com</title>
-        <link rel="icon" href="/favicon.png" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap"
-          rel="stylesheet"
-        />
       </Head>
 
       <Navbar />

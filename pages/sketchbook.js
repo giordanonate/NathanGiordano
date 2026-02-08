@@ -21,6 +21,7 @@ export async function getStaticProps() {
 export default function Sketchbook({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
   const itemRefs = useRef([])
+  const observerRef = useRef(null)
 
   useEffect(() => {
     document.body.classList.remove('reloading')
@@ -43,8 +44,9 @@ export default function Sketchbook({ media }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [media.length])
 
+  // Create a single persistent observer
   useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
+    observerRef.current = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (
           entry.isIntersecting &&
@@ -55,8 +57,25 @@ export default function Sketchbook({ media }) {
       })
     }, { threshold: 0.1 })
 
-    itemRefs.current.forEach(ref => ref && observer.observe(ref))
-    return () => itemRefs.current.forEach(ref => ref && observer.unobserve(ref))
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect()
+      }
+    }
+  }, [])
+
+  // Observe new items when visibleCount changes
+  useEffect(() => {
+    if (!observerRef.current) return
+
+    const frameId = requestAnimationFrame(() => {
+      itemRefs.current.forEach(ref => {
+        if (ref && !ref.classList.contains(styles.visible)) {
+          observerRef.current.observe(ref)
+        }
+      })
+    })
+    return () => cancelAnimationFrame(frameId)
   }, [visibleCount])
 
   useEffect(() => {
