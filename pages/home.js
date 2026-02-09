@@ -24,6 +24,7 @@ export async function getStaticProps() {
 export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
   const [shuffled, setShuffled] = useState([])
+  const [showReroll, setShowReroll] = useState(false)
   const itemRefs = useRef([])
 
   useEffect(() => {
@@ -85,19 +86,11 @@ export default function Home({ media }) {
   }, [shuffled])
 
   useEffect(() => {
-    const overlay = document.getElementById('fadeOverlay')
     const handleScroll = () => {
       const isSmallScreen = window.innerWidth <= 1525
       const threshold = isSmallScreen ? 15000 : 20000
-
-      if (window.scrollY > threshold) {
-        overlay?.classList.add(styles.visible)
-      } else {
-        overlay?.classList.remove(styles.visible)
-      }
+      setShowReroll(window.scrollY > threshold)
     }
-    // Check immediately on mount to clear stale overlay state
-    overlay?.classList.remove(styles.visible)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
@@ -177,7 +170,7 @@ export default function Home({ media }) {
         </Masonry>
       </main>
 
-      <div id="fadeOverlay" className={`${styles.fadeOverlay}`}>
+      <div className={`${styles.fadeOverlay} ${showReroll ? styles.visible : ''}`}>
         <img
           src="/assets/fade-overlay.png"
           alt="Fade Overlay"
