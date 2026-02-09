@@ -22,10 +22,6 @@ export default function Being({ media }) {
   const itemRefs = useRef([]);
 
   useEffect(() => {
-    document.body.classList.remove('reloading');
-  }, []);
-
-  useEffect(() => {
     setShuffled([...media].sort(() => 0.5 - Math.random()));
   }, [media]);
 
@@ -79,15 +75,13 @@ export default function Being({ media }) {
     <>
       <Head>
         <title>BEING Collection</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
       </Head>
       <Navbar />
-      <div className={styles.pageFade}></div>
       <div style={{ height: '80px' }}></div>
       <main className={styles.container} style={{ marginTop: '4rem' }}>
         <Masonry
           breakpointCols={breakpoints}
-          className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
+          className={styles.masonry}
           columnClassName={styles.column}
         >
           {visibleMedia.map((src, idx) => {

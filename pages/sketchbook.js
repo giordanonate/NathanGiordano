@@ -24,10 +24,6 @@ export default function Sketchbook({ media }) {
   const observerRef = useRef(null)
 
   useEffect(() => {
-    document.body.classList.remove('reloading')
-  }, [])
-
-  useEffect(() => {
     requestAnimationFrame(() => window.scrollTo(0, 0))
   }, [])
 
@@ -95,15 +91,13 @@ export default function Sketchbook({ media }) {
     <>
       <Head>
         <title>Sketchbook Collection</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
       </Head>
       <Navbar />
-      <div className={styles.pageFade}></div>
       <div style={{ height: '80px' }}></div>
       <main className={styles.container} style={{ marginTop: '4rem' }}>
         <Masonry
           breakpointCols={breakpoints}
-          className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
+          className={styles.masonry}
           columnClassName={styles.column}
         >
           {visibleMedia.map((src, idx) => {

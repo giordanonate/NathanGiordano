@@ -27,10 +27,6 @@ export default function Home({ media }) {
   const itemRefs = useRef([])
 
   useEffect(() => {
-    document.body.classList.remove('reloading')
-  }, [])
-
-  useEffect(() => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
     const itemLimit = isMobile ? 50 : 100
     const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit)
@@ -42,8 +38,6 @@ export default function Home({ media }) {
       history.scrollRestoration = 'manual'
     }
     window.scrollTo(0, 0)
-    requestAnimationFrame(() => window.scrollTo(0, 0))
-    setTimeout(() => window.scrollTo(0, 0), 0)
   }, [])
 
   useEffect(() => {

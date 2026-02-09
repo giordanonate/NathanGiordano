@@ -1,36 +1,11 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Roboto Mono', monospace;
-  scroll-behavior: smooth;
-  overflow-y: scroll;         /* ✅ force scrollbar even when not needed */
-}
-
-body.reloading {
-  pointer-events: none;
-}
-
-body.reloading .nav {
-  opacity: 1;
-  transition: none;
-}
-
-body.reloading .nav img {
-  pointer-events: none;
-  transform: none !important;
-  filter: grayscale(100%) brightness(1.1);
-}
-
-body.reloading .nav img:hover {
-  transform: none !important;
-}
-
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   width: 100%;
+  font-family: 'Roboto Mono', monospace;
   scroll-behavior: smooth;
+  overflow-y: scroll;
 }
 
 body.locked {

@@ -52,7 +52,6 @@ export default function Superbeing({ media }) {
 
   useEffect(() => {
     if (!authorized) return
-    document.body.classList.remove('reloading')
     setShuffled([...media].sort(() => 0.5 - Math.random()))
     requestAnimationFrame(() => window.scrollTo(0, 0))
   }, [media, authorized])
@@ -106,7 +105,6 @@ export default function Superbeing({ media }) {
     <>
       <Head>
         <title>SuperBEING Collection</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet" />
       </Head>
 
       <div style={{ position: 'relative', zIndex: 10000 }}>
@@ -176,7 +174,7 @@ export default function Superbeing({ media }) {
           <main className={styles.container} style={{ marginTop: '4rem' }}>
             <Masonry
               breakpointCols={breakpoints}
-              className={`${styles.masonry} ${styles.masonryWithTopPadding}`}
+              className={styles.masonry}
               columnClassName={styles.column}
             >
               {visibleMedia.map((src, idx) => {

@@ -36,12 +36,6 @@
   opacity: 0.7;
 }
 
-/* Disable clicks during transition */
-body.reloading .nav img {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
 /* Mobile menu bar (blurred box for ☰) */
 .menuBar {
   position: fixed;
