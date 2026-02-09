@@ -24,16 +24,10 @@ export async function getStaticProps() {
 export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
   const [shuffled, setShuffled] = useState([])
-  const [showReroll, setShowReroll] = useState(false)
-  const [canShowReroll, setCanShowReroll] = useState(false)
   const itemRefs = useRef([])
 
   useEffect(() => {
     document.body.classList.remove('reloading')
-    // Disable bfcache so reload() always gets a fresh page
-    const noop = () => {}
-    window.addEventListener('unload', noop)
-    return () => window.removeEventListener('unload', noop)
   }, [])
 
   useEffect(() => {
@@ -89,22 +83,6 @@ export default function Home({ media }) {
       })
     }, 50)
   }, [shuffled])
-
-  // Block reroll overlay for first 500ms to prevent flash on reload/bfcache
-  useEffect(() => {
-    const timer = setTimeout(() => setCanShowReroll(true), 500)
-    return () => clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const isSmallScreen = window.innerWidth <= 1525
-      const threshold = isSmallScreen ? 15000 : 20000
-      setShowReroll(window.scrollY > threshold)
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const breakpoints = { default: 3, 768: 2, 480: 1 }
   const visibleMedia = shuffled.slice(0, visibleCount)
@@ -180,26 +158,6 @@ export default function Home({ media }) {
 })}
         </Masonry>
       </main>
-
-      <div className={`${styles.fadeOverlay} ${showReroll && canShowReroll ? styles.visible : ''}`}>
-        <img
-          src="/assets/fade-overlay.png"
-          alt="Fade Overlay"
-          className={styles.fadeImage}
-        />
-        <button
-          className={styles.rerollButton}
-          onClick={() => {
-            setShowReroll(false)
-            setCanShowReroll(false)
-            setTimeout(() => {
-              window.location.href = window.location.pathname
-            }, 50)
-          }}
-        >
-          Reroll
-        </button>
-      </div>
     </>
   )
 }
