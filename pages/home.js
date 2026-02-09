@@ -196,7 +196,12 @@ export default function Home({ media }) {
         />
         <button
           className={styles.rerollButton}
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            setShowReroll(false)
+            window.dispatchEvent(
+              new CustomEvent('start-transition', { detail: `/home?refresh=${Date.now()}` })
+            )
+          }}
         >
           Reroll
         </button>
