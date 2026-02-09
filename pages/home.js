@@ -30,6 +30,10 @@ export default function Home({ media }) {
 
   useEffect(() => {
     document.body.classList.remove('reloading')
+    // Disable bfcache so reload() always gets a fresh page
+    const noop = () => {}
+    window.addEventListener('unload', noop)
+    return () => window.removeEventListener('unload', noop)
   }, [])
 
   useEffect(() => {
