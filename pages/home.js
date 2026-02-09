@@ -198,9 +198,11 @@ export default function Home({ media }) {
           className={styles.rerollButton}
           onClick={() => {
             setShowReroll(false)
-            window.dispatchEvent(
-              new CustomEvent('start-transition', { detail: `/home?refresh=${Date.now()}` })
-            )
+            window.scrollTo(0, 0)
+            const isMobile = window.innerWidth <= 768
+            const itemLimit = isMobile ? 50 : 100
+            setShuffled([...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit))
+            setVisibleCount(12)
           }}
         >
           Reroll
