@@ -25,6 +25,7 @@ export default function Home({ media }) {
   const [visibleCount, setVisibleCount] = useState(12)
   const [shuffled, setShuffled] = useState([])
   const [showReroll, setShowReroll] = useState(false)
+  const [canShowReroll, setCanShowReroll] = useState(false)
   const itemRefs = useRef([])
 
   useEffect(() => {
@@ -85,16 +86,10 @@ export default function Home({ media }) {
     }, 50)
   }, [shuffled])
 
-  // Handle bfcache restore (mobile Safari preserves state on reload)
+  // Block reroll overlay for first 500ms to prevent flash on reload/bfcache
   useEffect(() => {
-    const handlePageShow = (e) => {
-      if (e.persisted) {
-        setShowReroll(false)
-        window.scrollTo(0, 0)
-      }
-    }
-    window.addEventListener('pageshow', handlePageShow)
-    return () => window.removeEventListener('pageshow', handlePageShow)
+    const timer = setTimeout(() => setCanShowReroll(true), 500)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -103,14 +98,8 @@ export default function Home({ media }) {
       const threshold = isSmallScreen ? 15000 : 20000
       setShowReroll(window.scrollY > threshold)
     }
-    // Delay listener so scrollTo(0,0) takes effect first
-    const timer = setTimeout(() => {
-      window.addEventListener('scroll', handleScroll)
-    }, 200)
-    return () => {
-      clearTimeout(timer)
-      window.removeEventListener('scroll', handleScroll)
-    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const breakpoints = { default: 3, 768: 2, 480: 1 }
@@ -188,7 +177,7 @@ export default function Home({ media }) {
         </Masonry>
       </main>
 
-      <div className={`${styles.fadeOverlay} ${showReroll ? styles.visible : ''}`}>
+      <div className={`${styles.fadeOverlay} ${showReroll && canShowReroll ? styles.visible : ''}`}>
         <img
           src="/assets/fade-overlay.png"
           alt="Fade Overlay"
@@ -196,14 +185,7 @@ export default function Home({ media }) {
         />
         <button
           className={styles.rerollButton}
-          onClick={() => {
-            setShowReroll(false)
-            window.scrollTo(0, 0)
-            const isMobile = window.innerWidth <= 768
-            const itemLimit = isMobile ? 50 : 100
-            setShuffled([...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit))
-            setVisibleCount(12)
-          }}
+          onClick={() => window.location.reload()}
         >
           Reroll
         </button>
