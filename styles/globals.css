@@ -5,6 +5,9 @@ html, body {
   width: 100%;
   font-family: 'Roboto Mono', monospace;
   scroll-behavior: smooth;
+}
+
+body {
   overflow-y: scroll;
 }
 

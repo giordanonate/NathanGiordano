@@ -61,7 +61,6 @@ export default function Superbeing({ media }) {
     const handleScroll = () => {
       const scrollBottom = window.innerHeight + window.scrollY
       const docHeight = document.body.offsetHeight
-      if (docHeight >= 10000) return
       if (scrollBottom >= docHeight - 1000) {
         setVisibleCount(prev => Math.min(prev + 12, shuffled.length))
       }
