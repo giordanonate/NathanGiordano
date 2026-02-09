@@ -3,7 +3,6 @@ import Head from 'next/head'
 import path from 'path'
 import fs from 'fs'
 import Masonry from 'react-masonry-css'
-import Link from 'next/link'
 import styles from '../styles/feed.module.css'
 import Navbar from '../components/navbar'
 
@@ -111,12 +110,6 @@ export default function Sketchbook({ media }) {
                 <div className={styles.mediaWrapper}>
                   {src.match(/\.(mp4|mov)$/i) ? (
                     <video src={src} autoPlay muted loop playsInline preload="none" />
-                  ) : idx === 0 ? (
-                    <Link href="/sketchbook/book-1" legacyBehavior>
-                      <a>
-                        <img src={src} alt={`Sketchbook ${idx}`} loading="lazy" />
-                      </a>
-                    </Link>
                   ) : (
                     <img src={src} alt={`Sketchbook ${idx}`} loading="lazy" />
                   )}
