@@ -85,14 +85,32 @@ export default function Home({ media }) {
     }, 50)
   }, [shuffled])
 
+  // Handle bfcache restore (mobile Safari preserves state on reload)
+  useEffect(() => {
+    const handlePageShow = (e) => {
+      if (e.persisted) {
+        setShowReroll(false)
+        window.scrollTo(0, 0)
+      }
+    }
+    window.addEventListener('pageshow', handlePageShow)
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
+
   useEffect(() => {
     const handleScroll = () => {
       const isSmallScreen = window.innerWidth <= 1525
       const threshold = isSmallScreen ? 15000 : 20000
       setShowReroll(window.scrollY > threshold)
     }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    // Delay listener so scrollTo(0,0) takes effect first
+    const timer = setTimeout(() => {
+      window.addEventListener('scroll', handleScroll)
+    }, 200)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   const breakpoints = { default: 3, 768: 2, 480: 1 }
