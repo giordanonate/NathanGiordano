@@ -189,7 +189,13 @@ export default function Home({ media }) {
         />
         <button
           className={styles.rerollButton}
-          onClick={() => window.location.reload()}
+          onClick={() => {
+            setShowReroll(false)
+            setCanShowReroll(false)
+            setTimeout(() => {
+              window.location.href = window.location.pathname
+            }, 50)
+          }}
         >
           Reroll
         </button>
