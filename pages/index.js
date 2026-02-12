@@ -14,8 +14,15 @@ export default function IndexPage() {
         <title>nathangiordano.com</title>
       </Head>
       <div style={wrapperStyle} onClick={handleEnter}>
-        <h1 style={enterStyle}>Enter</h1>
+        <h1 style={enterStyle} className="enter-text">Enter</h1>
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .enter-text {
+            margin-top: -7vh !important;
+          }
+        }
+      `}</style>
     </>
   )
 }

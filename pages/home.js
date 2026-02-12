@@ -12,7 +12,6 @@ export async function getStaticProps() {
   media = media
     .filter(url => url.match(/\.(jpg|jpeg|png|gif|webp|mp4|mov)$/i))
     .sort(() => 0.5 - Math.random())
-    .slice(0, 100)
 
   return {
     props: { media },
@@ -27,10 +26,7 @@ export default function Home({ media }) {
   const itemRefs = useRef([])
 
   useEffect(() => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-    const itemLimit = isMobile ? 50 : 100
-    const limited = [...media].sort(() => 0.5 - Math.random()).slice(0, itemLimit)
-    setShuffled(limited)
+    setShuffled([...media].sort(() => 0.5 - Math.random()))
   }, [media])
 
   useEffect(() => {
@@ -102,8 +98,7 @@ export default function Home({ media }) {
           <p>
             The collection reshuffles itself every time you load the page. That
             interplay—the juxtaposition of elements, the unexpected pairings—is
-            part of what keeps it interesting. The page only loads 100 items at
-            a time, although the database has more than that.
+            part of what keeps it interesting.
           </p>
         </div>
         <div className={styles.socialIcons}>
