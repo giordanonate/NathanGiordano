@@ -13,6 +13,11 @@ export default function EarthCanvas() {
   const cloudSpin = useRef(0)
   const lightTarget = useRef(new THREE.Vector3(0, 0, 5))
   const rendererRef = useRef(null)
+  const isDragging = useRef(false)
+  const dragStart = useRef({ x: 0, y: 0 })
+  const dragOffset = useRef({ x: 0, y: 0 })
+  const dragVelocity = useRef({ x: 0, y: 0 })
+  const targetOffset = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     const mount = mountRef.current
@@ -98,17 +103,67 @@ export default function EarthCanvas() {
       lightTarget.current.set(radius * x, radius * y, 5)
     }
 
+    const handleMouseDown = (event) => {
+      const rect = mount.getBoundingClientRect()
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      raycaster.setFromCamera(mouse, camera)
+      const intersects = raycaster.intersectObject(earth)
+      if (intersects.length > 0) {
+        isDragging.current = true
+        dragStart.current = { x: event.clientX, y: event.clientY }
+        mount.style.cursor = 'grabbing'
+      }
+    }
+
     const handleMouseMove = (event) => {
       const rect = mount.getBoundingClientRect()
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1
       updateLightFromXY(x, y)
 
-      mouse.x = x
-      mouse.y = y
+      if (isDragging.current) {
+        const rawDx = event.clientX - dragStart.current.x
+        const rawDy = -(event.clientY - dragStart.current.y)
+        const dist = Math.sqrt(rawDx * rawDx + rawDy * rawDy)
+        const maxDrag = 555
+        const ratio = dist / maxDrag
+        const strained = (ratio / (1 + ratio)) * maxDrag
+        const scale = dist > 0 ? strained / dist : 0
+        const dx = (rawDx * scale) / mount.clientWidth * 1.5
+        const dy = (rawDy * scale) / mount.clientHeight * 1.5
+        targetOffset.current = { x: dx, y: dy }
+        mount.style.cursor = 'grabbing'
+      } else {
+        mouse.x = x
+        mouse.y = y
+        raycaster.setFromCamera(mouse, camera)
+        const intersects = raycaster.intersectObject(earth)
+        mount.style.cursor = intersects.length > 0 ? 'grab' : 'default'
+      }
+    }
+
+    const handleMouseUp = () => {
+      if (isDragging.current) {
+        isDragging.current = false
+        targetOffset.current = { x: 0, y: 0 }
+        mount.style.cursor = 'default'
+      }
+    }
+
+    const handleTouchStart = (e) => {
+      if (!e.touches || e.touches.length === 0) return
+      const touch = e.touches[0]
+      const rect = mount.getBoundingClientRect()
+      mouse.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1
+      mouse.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1
       raycaster.setFromCamera(mouse, camera)
       const intersects = raycaster.intersectObject(earth)
-      mount.style.cursor = intersects.length > 0 ? 'pointer' : 'default'
+      if (intersects.length > 0) {
+        isDragging.current = true
+        dragStart.current = { x: touch.clientX, y: touch.clientY }
+      }
+      lastTouchX.current = touch.clientX
     }
 
     const handleTouchMove = (e) => {
@@ -119,6 +174,19 @@ export default function EarthCanvas() {
       const y = -((touch.clientY - rect.top) / rect.height) * 2 + 1
       updateLightFromXY(x, y)
 
+      if (isDragging.current) {
+        const rawDx = touch.clientX - dragStart.current.x
+        const rawDy = -(touch.clientY - dragStart.current.y)
+        const dist = Math.sqrt(rawDx * rawDx + rawDy * rawDy)
+        const maxDrag = 555
+        const ratio = dist / maxDrag
+        const strained = (ratio / (1 + ratio)) * maxDrag
+        const scale = dist > 0 ? strained / dist : 0
+        const dx = (rawDx * scale) / mount.clientWidth * 1.5
+        const dy = (rawDy * scale) / mount.clientHeight * 1.5
+        targetOffset.current = { x: dx, y: dy }
+      }
+
       if (lastTouchX.current !== null) {
         const dx = touch.clientX - lastTouchX.current
         spinVelocity.current = dx * 0.005
@@ -128,6 +196,10 @@ export default function EarthCanvas() {
 
     const handleTouchEnd = () => {
       lastTouchX.current = null
+      if (isDragging.current) {
+        isDragging.current = false
+        targetOffset.current = { x: 0, y: 0 }
+      }
     }
 
     const handleClick = (event) => {
@@ -157,6 +229,21 @@ export default function EarthCanvas() {
       earth.rotation.y = spin.current
       clouds.rotation.y = cloudSpin.current
 
+      // Spring physics for bouncy snap-back
+      const stiffness = 0.024
+      const damping = 0.92
+      dragVelocity.current.x += (targetOffset.current.x - dragOffset.current.x) * stiffness
+      dragVelocity.current.y += (targetOffset.current.y - dragOffset.current.y) * stiffness
+      dragVelocity.current.x *= damping
+      dragVelocity.current.y *= damping
+      dragOffset.current.x += dragVelocity.current.x
+      dragOffset.current.y += dragVelocity.current.y
+
+      earth.position.x = dragOffset.current.x
+      earth.position.y = dragOffset.current.y
+      clouds.position.x = dragOffset.current.x
+      clouds.position.y = dragOffset.current.y
+
       spotLight.position.lerp(lightTarget.current, 0.05)
 
       composer.render()
@@ -164,14 +251,20 @@ export default function EarthCanvas() {
     }
     animate()
 
+    mount.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    mount.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: true })
     window.addEventListener('touchend', handleTouchEnd)
     window.addEventListener('resize', handleResize)
     window.addEventListener('click', handleClick)
 
     return () => {
+      mount.removeEventListener('mousedown', handleMouseDown)
       window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      mount.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('resize', handleResize)
