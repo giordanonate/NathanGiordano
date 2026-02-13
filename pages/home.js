@@ -96,9 +96,7 @@ export default function Home({ media }) {
             drawing, and digital-physical hybrids. I create in multi-media.
           </h1>
           <p>
-            The collection reshuffles itself every time you load the page. That
-            interplay—the juxtaposition of elements, the unexpected pairings—is
-            part of what keeps it interesting.
+            The collection reshuffles itself every time you load the page.
           </p>
         </div>
         <div className={styles.socialIcons}>
