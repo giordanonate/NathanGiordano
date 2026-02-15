@@ -7,13 +7,18 @@ export default function ImageSequence() {
   const imagesRef = useRef([])
   const [loaded, setLoaded] = useState(false)
   const [motionEnabled, setMotionEnabled] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    const mobile = window.innerWidth <= 768
+    setIsMobile(mobile)
+    const folder = mobile ? '/imgod-mobile' : '/imgod'
+
     let loadedCount = 0
     const imgs = []
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image()
-      img.src = `/imgod/god${String(i).padStart(4, '0')}.png`
+      img.src = `${folder}/god${String(i).padStart(4, '0')}.png`
       img.onload = () => {
         loadedCount++
         if (loadedCount === TOTAL_FRAMES) setLoaded(true)
@@ -24,7 +29,6 @@ export default function ImageSequence() {
   }, [])
 
   useEffect(() => {
-    // Desktop: mouse position
     const handleMouseMove = (e) => {
       const progress = Math.max(0, Math.min(1, e.clientX / window.innerWidth))
       const frame = Math.round(progress * (TOTAL_FRAMES - 1))
@@ -32,7 +36,6 @@ export default function ImageSequence() {
     }
     window.addEventListener('mousemove', handleMouseMove)
 
-    // Mobile: device tilt
     const handleOrientation = (e) => {
       if (e.gamma == null) return
       const gamma = Math.max(-45, Math.min(45, e.gamma))
@@ -67,7 +70,6 @@ export default function ImageSequence() {
         className="image-sequence"
         style={{
           position: 'relative',
-          cursor: 'default',
           borderRadius: '6px',
           overflow: 'hidden',
         }}
@@ -82,6 +84,8 @@ export default function ImageSequence() {
               height: '100%',
               objectFit: 'cover',
               userSelect: 'none',
+              filter: (isMobile && !motionEnabled) ? 'blur(10px)' : 'none',
+              transition: 'filter 0.4s ease',
             }}
           />
         ) : (
@@ -98,41 +102,38 @@ export default function ImageSequence() {
             Loading...
           </div>
         )}
+        {isMobile && !motionEnabled && loaded && (
+          <button
+            onClick={requestMotion}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontFamily: 'Roboto Mono, monospace',
+              fontSize: '0.85rem',
+              color: '#fff',
+              cursor: 'pointer',
+              letterSpacing: '0.05em',
+              zIndex: 1,
+            }}
+          >
+            Enable tilt
+          </button>
+        )}
       </div>
-      {!motionEnabled && (
-        <button
-          onClick={requestMotion}
-          className="motion-btn"
-          style={{
-            display: 'none',
-            background: 'none',
-            border: '1px solid #ccc',
-            borderRadius: '4px',
-            padding: '0.4rem 0.8rem',
-            fontFamily: 'Roboto Mono, monospace',
-            fontSize: '0.75rem',
-            color: '#555',
-            cursor: 'pointer',
-          }}
-        >
-          Enable tilt
-        </button>
-      )}
       <style jsx>{`
         .image-sequence {
           width: 600px;
           height: 600px;
         }
-        .motion-btn {
-          display: none !important;
-        }
         @media (max-width: 768px) {
           .image-sequence {
             width: 300px;
             height: 300px;
-          }
-          .motion-btn {
-            display: inline-block !important;
           }
         }
       `}</style>

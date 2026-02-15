@@ -21,7 +21,7 @@ export default function IndexPage() {
       <style jsx>{`
         @media (max-width: 768px) {
           .enter-text {
-            margin-top: -7vh !important;
+            margin-top: 0 !important;
           }
         }
       `}</style>
