@@ -6,6 +6,7 @@ export default function ImageSequence() {
   const [currentFrame, setCurrentFrame] = useState(0)
   const imagesRef = useRef([])
   const [loaded, setLoaded] = useState(false)
+  const [motionEnabled, setMotionEnabled] = useState(false)
 
   useEffect(() => {
     let loadedCount = 0
@@ -31,7 +32,7 @@ export default function ImageSequence() {
     }
     window.addEventListener('mousemove', handleMouseMove)
 
-    // Mobile: device tilt (gamma = left/right, -90 to 90)
+    // Mobile: device tilt
     const handleOrientation = (e) => {
       if (e.gamma == null) return
       const gamma = Math.max(-45, Math.min(45, e.gamma))
@@ -39,51 +40,102 @@ export default function ImageSequence() {
       const frame = Math.round(progress * (TOTAL_FRAMES - 1))
       setCurrentFrame(frame)
     }
-    window.addEventListener('deviceorientation', handleOrientation)
+
+    if (motionEnabled) {
+      window.addEventListener('deviceorientation', handleOrientation)
+    }
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('deviceorientation', handleOrientation)
     }
-  }, [])
+  }, [motionEnabled])
+
+  const requestMotion = async () => {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      const permission = await DeviceOrientationEvent.requestPermission()
+      if (permission === 'granted') setMotionEnabled(true)
+    } else {
+      setMotionEnabled(true)
+    }
+  }
 
   return (
-    <div
-      style={{
-        width: '600px',
-        height: '600px',
-        position: 'relative',
-        cursor: 'default',
-        borderRadius: '6px',
-        overflow: 'hidden',
-      }}
-    >
-      {loaded ? (
-        <img
-          src={imagesRef.current[currentFrame]?.src}
-          alt=""
-          draggable={false}
-          style={{
+    <>
+      <div
+        className="image-sequence"
+        style={{
+          position: 'relative',
+          cursor: 'default',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        {loaded ? (
+          <img
+            src={imagesRef.current[currentFrame]?.src}
+            alt=""
+            draggable={false}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              userSelect: 'none',
+            }}
+          />
+        ) : (
+          <div style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
-            userSelect: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: '0.8rem',
+            color: '#999',
+          }}>
+            Loading...
+          </div>
+        )}
+      </div>
+      {!motionEnabled && (
+        <button
+          onClick={requestMotion}
+          className="motion-btn"
+          style={{
+            display: 'none',
+            background: 'none',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            padding: '0.4rem 0.8rem',
+            fontFamily: 'Roboto Mono, monospace',
+            fontSize: '0.75rem',
+            color: '#555',
+            cursor: 'pointer',
           }}
-        />
-      ) : (
-        <div style={{
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontFamily: 'Roboto Mono, monospace',
-          fontSize: '0.8rem',
-          color: '#999',
-        }}>
-          Loading...
-        </div>
+        >
+          Enable tilt
+        </button>
       )}
-    </div>
+      <style jsx>{`
+        .image-sequence {
+          width: 600px;
+          height: 600px;
+        }
+        .motion-btn {
+          display: none !important;
+        }
+        @media (max-width: 768px) {
+          .image-sequence {
+            width: 300px;
+            height: 300px;
+          }
+          .motion-btn {
+            display: inline-block !important;
+          }
+        }
+      `}</style>
+    </>
   )
 }
