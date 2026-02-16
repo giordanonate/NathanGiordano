@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-const TOTAL_FRAMES = 45
+const TOTAL_FRAMES = 30
 
 export default function ImageSequence() {
   const [currentFrame, setCurrentFrame] = useState(0)
@@ -18,7 +18,7 @@ export default function ImageSequence() {
     const imgs = []
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image()
-      img.src = `${folder}/god${String(i).padStart(4, '0')}.png`
+      img.src = `${folder}/god-three-dimension${String(i).padStart(4, '0')}.png`
       img.onload = () => {
         loadedCount++
         if (loadedCount === TOTAL_FRAMES) setLoaded(true)
