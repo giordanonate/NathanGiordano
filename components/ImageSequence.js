@@ -13,12 +13,13 @@ export default function ImageSequence() {
     const mobile = window.innerWidth <= 768
     setIsMobile(mobile)
     const folder = mobile ? '/imgod-mobile' : '/imgod'
+    const prefix = mobile ? 'god-three-dimension-two' : 'god-three-dimension'
 
     let loadedCount = 0
     const imgs = []
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image()
-      img.src = `${folder}/god-three-dimension${String(i).padStart(4, '0')}.png`
+      img.src = `${folder}/${prefix}${String(i).padStart(4, '0')}.png`
       img.onload = () => {
         loadedCount++
         if (loadedCount === TOTAL_FRAMES) setLoaded(true)

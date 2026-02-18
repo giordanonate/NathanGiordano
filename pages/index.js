@@ -15,16 +15,11 @@ export default function IndexPage() {
         <title>nathangiordano.com</title>
       </Head>
       <div style={wrapperStyle}>
-        <ImageSequence />
-        <h1 style={enterStyle} className="enter-text" onClick={handleEnter}>Enter</h1>
+        <div style={groupStyle}>
+          <ImageSequence />
+          <h1 style={enterStyle} onClick={handleEnter}>Enter</h1>
+        </div>
       </div>
-      <style jsx>{`
-        @media (max-width: 768px) {
-          .enter-text {
-            margin-top: 0 !important;
-          }
-        }
-      `}</style>
     </>
   )
 }
@@ -33,10 +28,15 @@ const wrapperStyle = {
   width: '100vw',
   height: '100vh',
   display: 'flex',
-  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
   backgroundColor: '#fff',
+}
+
+const groupStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
   gap: '2rem',
 }
 
