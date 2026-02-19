@@ -26,7 +26,7 @@ export default function ImageSequence() {
       }
       imgs.push(img)
     }
-    imagesRef.current = imgs
+    imagesRef.current = imgs.reverse()
   }, [])
 
   useEffect(() => {
@@ -39,8 +39,8 @@ export default function ImageSequence() {
 
     const handleOrientation = (e) => {
       if (e.gamma == null) return
-      const gamma = Math.max(-45, Math.min(45, e.gamma))
-      const progress = (gamma + 45) / 90
+      const gamma = Math.max(-20, Math.min(20, e.gamma))
+      const progress = (gamma + 20) / 40
       const frame = Math.round(progress * (TOTAL_FRAMES - 1))
       setCurrentFrame(frame)
     }
@@ -133,8 +133,8 @@ export default function ImageSequence() {
         }
         @media (max-width: 768px) {
           .image-sequence {
-            width: 300px;
-            height: 300px;
+            width: 333px;
+            height: 333px;
           }
         }
       `}</style>
