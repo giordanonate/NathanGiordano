@@ -26,7 +26,7 @@ export default function IndexPage() {
 
 const wrapperStyle = {
   width: '100vw',
-  height: '100vh',
+  height: '100dvh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

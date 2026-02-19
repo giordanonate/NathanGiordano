@@ -39,8 +39,8 @@ export default function ImageSequence() {
 
     const handleOrientation = (e) => {
       if (e.gamma == null) return
-      const gamma = Math.max(-20, Math.min(20, e.gamma))
-      const progress = (gamma + 20) / 40
+      const gamma = Math.max(-28, Math.min(28, e.gamma))
+      const progress = (gamma + 28) / 56
       const frame = Math.round(progress * (TOTAL_FRAMES - 1))
       setCurrentFrame(frame)
     }
