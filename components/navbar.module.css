@@ -3,6 +3,18 @@
   width: 100%;
 }
 
+/* White backdrop: below earth (100) but above copy/masonry (2) */
+.navBg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: white;
+  z-index: 50;
+  pointer-events: none;
+}
+
 /* Main nav container */
 .nav {
   position: fixed;

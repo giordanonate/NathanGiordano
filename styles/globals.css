@@ -5,6 +5,7 @@ html, body {
   width: 100%;
   font-family: 'Roboto Mono', monospace;
   scroll-behavior: smooth;
+  background: white;
 }
 
 body {
@@ -46,4 +47,3 @@ body.locked {
 .transition-overlay.fade-out {
   opacity: 0;
 }
-

@@ -85,7 +85,7 @@ export default function Home({ media }) {
 
       <Navbar />
 
-      <section style={{ width: '100%', position: 'relative', zIndex: 1 }}>
+      <section style={{ width: '100%', position: 'relative', zIndex: 100 }}>
         <EarthCanvas />
       </section>
 

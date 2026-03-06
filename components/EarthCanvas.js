@@ -282,8 +282,8 @@ return (
   style={{
     width: '100%',
     height: '90vh',
-    position: 'relative', // changed from absolute
-    zIndex: 1,
+    position: 'relative',
+    zIndex: 100,
     transform: 'translateY(-3rem)'
   }}
 />

@@ -46,6 +46,8 @@ export default function Navbar() {
 
   return (
     <div className={styles.navWrapper}>
+      <div className={styles.navBg} />
+
       {isMobile && (
         <div className={styles.menuBar}>
           <button
