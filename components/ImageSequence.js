@@ -26,7 +26,7 @@ export default function ImageSequence() {
       }
       imgs.push(img)
     }
-    imagesRef.current = imgs.reverse()
+    imagesRef.current = mobile ? imgs.reverse() : imgs
   }, [])
 
   useEffect(() => {
